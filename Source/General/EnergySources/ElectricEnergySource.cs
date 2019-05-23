@@ -40,29 +40,11 @@ namespace FrontierDevelopments.General.EnergySources
             }
         }
 
-        public float GainEnergyAvailable
-        {
-            get
-            {
-                if (_powerTrader?.PowerNet != null)
-                {
-                    return _powerTrader.PowerNet.CurrentEnergyGainRate() / GenDate.TicksPerDay;
-                }
-                return 0f;
-            }
-        }
+        public float GainEnergyAvailable => GainEnergyRate / GenDate.TicksPerDay;
 
-        public float StoredEnergyAvailable
-        {
-            get
-            {
-                if (_powerTrader?.PowerNet != null)
-                {
-                    return _powerTrader.PowerNet.CurrentStoredEnergy();
-                }
-                return 0f;
-            }
-        }
+        public float StoredEnergyAvailable => _powerTrader?.PowerNet?.CurrentStoredEnergy() ?? 0f;
+
+        private float GainEnergyRate => _powerTrader?.PowerNet?.CurrentEnergyGainRate() ?? 0f;
 
         public float EnergyAvailable => GainEnergyAvailable + StoredEnergyAvailable;
 
@@ -82,9 +64,9 @@ namespace FrontierDevelopments.General.EnergySources
         // Do the actual draw
         public override void CompTick()
         {
-            if (_powerTrader.PowerNet != null && _additionalPowerDraw > 0f)
+            if (IsActive() && _additionalPowerDraw > 0f)
             {
-                var availThisTick = _powerTrader.PowerNet.CurrentEnergyGainRate() + StoredEnergyAvailable * 60000;
+                var availThisTick = GainEnergyRate + StoredEnergyAvailable * 60000;
                 var powerWanted = BaseConsumption - _additionalPowerDraw;
                 if (availThisTick + powerWanted < 0)
                 {
@@ -98,8 +80,11 @@ namespace FrontierDevelopments.General.EnergySources
 
         public void Drain(float amount)
         {
-            var perBattery = amount / _powerTrader.PowerNet.batteryComps.Count;
-            _powerTrader.PowerNet.batteryComps.ForEach(battery => battery.DrawPower(perBattery));
+            if (_powerTrader?.PowerNet?.batteryComps != null)
+            {
+                var perBattery = amount / _powerTrader.PowerNet.batteryComps.Count;
+                _powerTrader.PowerNet.batteryComps.ForEach(battery => battery.DrawPower(perBattery));
+            }
         }
 
         public float Draw(float amount)
@@ -121,7 +106,7 @@ namespace FrontierDevelopments.General.EnergySources
             if (_powerTrader.PowerNet == null) return 0f;
             
             // can this be feed by instantaneous draw? (who are we kidding, no way)
-            var gainPowerCovers = _powerTrader.PowerNet.CurrentEnergyGainRate() + BaseConsumption + amount;
+            var gainPowerCovers = GainEnergyRate + BaseConsumption + amount;
             if (gainPowerCovers >= 0) return amount;
             var gainAndBatteriesCover = gainPowerCovers + StoredEnergyAvailable * 60000;
 
