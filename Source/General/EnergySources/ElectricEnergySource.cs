@@ -82,7 +82,6 @@ namespace FrontierDevelopments.General.EnergySources
         // Do the actual draw
         public override void CompTick()
         {
-            Log.Message("power: " + GainEnergyAvailable);
             if (_powerTrader.PowerNet != null && _additionalPowerDraw > 0f)
             {
                 var availThisTick = _powerTrader.PowerNet.CurrentEnergyGainRate() + StoredEnergyAvailable * 60000;

@@ -27,17 +27,17 @@ namespace FrontierDevelopments.General
                         if (assembly != null)
                         {
                             harmony.PatchAll(assembly);
-                            Log.Message("Frontier Developments Shields :: enabled " + OtherModName + " support");
+                            Log.Message(ThisModName + " :: enabled " + OtherModName + " support");
                             return true;
                         }
                         else
                         {
-                            Log.Warning("Frontier Developments Shields :: unable to load " + OtherModName + " support assembly");
+                            Log.Warning(ThisModName + " :: unable to load " + OtherModName + " support assembly");
                         }
                     }
                     else
                     {
-                        Log.Warning("Frontier Developments Shields :: " + OtherModName + " " + version + 
+                        Log.Warning(ThisModName + " :: " + OtherModName + " " + version + 
                                     "is loaded and " + OtherModVersion + " is required, not enabling support");
                     }
                 }
