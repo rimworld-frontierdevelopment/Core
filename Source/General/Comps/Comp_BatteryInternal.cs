@@ -53,7 +53,10 @@ namespace FrontierDevelopments.General.Comps
         private void ChargeFromOther(CompPowerBattery battery, float charge)
         {
             battery.DrawPower(charge);
+            var efficiency = Props.efficiency;
+            Props.efficiency = 1.0f;
             AddEnergy(charge);
+            Props.efficiency = efficiency;
         }
 
         private void ChargeInternalBattery()
