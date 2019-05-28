@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -21,18 +24,20 @@ namespace FrontierDevelopments.General
                 case IEnergySource parentSource:
                     return parentSource;
                 default:
-                    foreach (var comp in parent.AllComps)
-                    {
-                        switch (comp)
-                        {
-                            case IEnergySource compSource:
-                                return compSource;
-                        }
-                    }
-                    break;
+                    return FindComp(parent.AllComps);
             }
+        }
 
-            return null;
+        public static IEnergySource FindComp(IEnumerable<ThingComp> comps)
+        {
+            try
+            {
+                return comps.OfType<IEnergySource>().First();
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
     }   
 }

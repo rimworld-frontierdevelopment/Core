@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -18,21 +21,20 @@ namespace FrontierDevelopments.General
                 case IHeatsink parentHeatsink:
                     return parentHeatsink;
                 default:
-                    return FindComp(parent);
+                    return FindComp(parent.AllComps);
             }
         }
 
-        public static IHeatsink FindComp(ThingWithComps parent)
+        public static IHeatsink FindComp(IEnumerable<ThingComp> comps)
         {
-            foreach (var comp in parent.AllComps)
+            try
             {
-                switch (comp)
-                {
-                    case IHeatsink compHeatSink:
-                        return compHeatSink;
-                }
+                return comps.OfType<IHeatsink>().First();
             }
-            return null;
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
         }
     }
 }
