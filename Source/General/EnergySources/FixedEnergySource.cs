@@ -13,7 +13,7 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
     
-    public class Comp_FixedEnergySource : Verse.ThingComp, IEnergySource
+    public class Comp_FixedEnergySource : ThingComp, IEnergySource
     {
         private CompProperties_FixedEnergySource Props => (CompProperties_FixedEnergySource) props;
 
@@ -21,16 +21,18 @@ namespace FrontierDevelopments.General.EnergySources
         
         public float BaseConsumption { get => 0f; set {} }
 
-        public bool WantActive => _flickable != null && _flickable.SwitchIsOn || _flickable == null;
+        public bool WantActive => _flickable?.SwitchIsOn ?? true;
+
         public float EnergyAvailable => float.PositiveInfinity;
 
         public bool IsActive()
         {
-            return (_flickable != null && _flickable.SwitchIsOn || _flickable == null);
+            return WantActive;
         }
 
-        public override void PostSpawnSetup(bool respawningAfterLoad)
+        public override void Initialize(CompProperties props)
         {
+            base.Initialize(props);
             _flickable = parent.GetComp<CompFlickable>();
         }
 

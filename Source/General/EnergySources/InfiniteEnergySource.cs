@@ -10,22 +10,23 @@ namespace FrontierDevelopments.General.EnergySources
             compClass = typeof(Comp_InfiniteEnergySource);
         }
     }
-    
+
     public class Comp_InfiniteEnergySource : ThingComp, IEnergySource
     {
         private CompFlickable _flickable;
 
         public float BaseConsumption { get => 0f; set {} }
-        public bool WantActive => _flickable != null && _flickable.SwitchIsOn || _flickable == null;
+        public bool WantActive => _flickable?.SwitchIsOn ?? true;
         public float EnergyAvailable => float.PositiveInfinity;
 
         public bool IsActive()
         {
-            return _flickable != null && _flickable.SwitchIsOn || _flickable == null;
+            return WantActive;
         }
 
-        public override void PostSpawnSetup(bool respawningAfterLoad)
+        public override void Initialize(CompProperties props)
         {
+            base.Initialize(props);
             _flickable = parent.GetComp<CompFlickable>();
         }
 

@@ -22,12 +22,11 @@ namespace FrontierDevelopments.General.EnergySources
 
         private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource) props;
 
-        public bool WantActive => _powerTrader?.PowerOn == true;
+        public bool WantActive => _powerTrader?.PowerOn ?? true;
 
         public bool IsActive()
         {
-            return _powerTrader?.PowerOn == true
-                   && EnergyAvailable >= Props.minimumOnlinePower;
+            return WantActive && EnergyAvailable >= Props.minimumOnlinePower;
         }
 
         public float BaseConsumption
@@ -66,7 +65,7 @@ namespace FrontierDevelopments.General.EnergySources
         {
             if (IsActive() && _additionalPowerDraw > 0f)
             {
-                var availThisTick = GainEnergyRate + StoredEnergyAvailable * 60000;
+                var availThisTick = GainEnergyRate + StoredEnergyAvailable * GenDate.TicksPerDay;
                 var powerWanted = BaseConsumption - _additionalPowerDraw;
                 if (availThisTick + powerWanted < 0)
                 {
@@ -108,7 +107,7 @@ namespace FrontierDevelopments.General.EnergySources
             // can this be feed by instantaneous draw? (who are we kidding, no way)
             var gainPowerCovers = GainEnergyRate + BaseConsumption + amount;
             if (gainPowerCovers >= 0) return amount;
-            var gainAndBatteriesCover = gainPowerCovers + StoredEnergyAvailable * 60000;
+            var gainAndBatteriesCover = gainPowerCovers + StoredEnergyAvailable * GenDate.TicksPerDay;
 
             // will batteries cover the difference?
             if (gainAndBatteriesCover >= 0) return amount;

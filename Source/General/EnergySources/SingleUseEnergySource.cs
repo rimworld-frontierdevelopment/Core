@@ -22,7 +22,7 @@ namespace FrontierDevelopments.General.EnergySources
 
         public virtual float MinimumCharge => 0f;
 
-        public bool WantActive => _flickable != null && _flickable.SwitchIsOn || _flickable == null;
+        public bool WantActive => _flickable?.SwitchIsOn ?? true;
         public float BaseConsumption { get => 0f; set {} }
         public float EnergyAvailable => _charge;
 
@@ -31,9 +31,10 @@ namespace FrontierDevelopments.General.EnergySources
             return _charge >= MinimumCharge
                    && WantActive;
         }
-        
-        public override void PostSpawnSetup(bool respawningAfterLoad)
+
+        public override void Initialize(CompProperties props)
         {
+            base.Initialize(props);
             _flickable = parent.GetComp<CompFlickable>();
             if (_charge < 0) _charge = Props.charge;
         }
