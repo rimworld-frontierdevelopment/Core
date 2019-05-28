@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace FrontierDevelopments.General
 {
-    public static class Common
+    public static class PositionUtility
     {
         public static bool RectOverlaps(CellRect one, CellRect two)
         {
@@ -48,6 +49,23 @@ namespace FrontierDevelopments.General
         public static Vector3 ToVector3WithY(IntVec3 intVec3, float y)
         {
             return new Vector3(intVec3.x + 0.5f, y + 0.5f, intVec3.z + 0.5f);
+        }
+
+        public static Vector3? GetRealPosition(IThingHolder holder)
+        {
+            switch (holder.ParentHolder)
+            {
+                case null:
+                    return null;
+                case MinifiedThing minified:
+                    return GetRealPosition(minified.ParentHolder);
+                case Thing thing:
+                    return thing.TrueCenter();
+                case Pawn_InventoryTracker tracker:
+                    return tracker.pawn.TrueCenter();
+            }
+
+            return null;
         }
     }
 }
