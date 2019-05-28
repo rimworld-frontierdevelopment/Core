@@ -106,7 +106,7 @@ namespace FrontierDevelopments.General.Comps
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
-            if (parent.Faction == Faction.OfPlayer)
+            if (OwnershipUtility.PlayerOwns(parent))
             {
                 yield return new Command_Toggle
                 {
@@ -156,7 +156,7 @@ namespace FrontierDevelopments.General.Comps
         private float MajorBreakdown()
         {
             parent.GetComp<CompBreakdownable>().DoBreakdown();
-            if (parent.Faction == Faction.OfPlayer)
+            if (OwnershipUtility.PlayerOwns(parent))
             {
                 // manually remove the default letter...
                 try
@@ -186,7 +186,7 @@ namespace FrontierDevelopments.General.Comps
         
         private void BreakdownMessage(string title, string body, float drained)
         {
-            if (parent.Faction != Faction.OfPlayer) return;
+            if (!OwnershipUtility.PlayerOwns(parent)) return;
             Find.LetterStack.ReceiveLetter(
                 title,
                 body.Replace("{0}", ((int)drained).ToString()), 

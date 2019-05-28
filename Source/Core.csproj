@@ -55,6 +55,7 @@
     <Compile Include="General\AssemblyUtility.cs" />
     <Compile Include="General\Mod.cs" />
     <Compile Include="General\ModIntegration.cs" />
+    <Compile Include="General\OwnershipUtility.cs" />
     <Compile Include="General\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="General\Common.cs" />
