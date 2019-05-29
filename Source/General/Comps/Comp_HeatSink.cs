@@ -60,7 +60,7 @@ namespace FrontierDevelopments.General.Comps
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
-            if (_temperature < -KELVIN_ZERO_CELCIUS) _temperature = parent.AmbientTemperature;
+            if (_temperature < -KELVIN_ZERO_CELCIUS) _temperature = AmbientTemp();
             if (_shutoffTemperature < -KELVIN_ZERO_CELCIUS) _shutoffTemperature = Props.minorThreshold;
             _dissipationRate = GenDate.TicksPerDay / Props.conductivity;
         }
