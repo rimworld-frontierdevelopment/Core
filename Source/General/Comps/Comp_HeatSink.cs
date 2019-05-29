@@ -30,6 +30,7 @@ namespace FrontierDevelopments.General.Comps
         private float _dissipationRate;
         private float _temperature = -500f;
         private bool _thermalShutoff = true;
+        private float _shutoffTemperature = -500f;
 
         public bool CanBreakdown => !_thermalShutoff && OverMinorThreshold;
         
@@ -43,7 +44,7 @@ namespace FrontierDevelopments.General.Comps
             set =>  _temperature = value / Props.specificHeat / Props.grams - KELVIN_ZERO_CELCIUS;
         }
 
-        public bool OverTemperature => _thermalShutoff && OverMinorThreshold 
+        public bool OverTemperature => _thermalShutoff && Temp > _shutoffTemperature
                                        || !Settings.EnableCriticalThermalIncidents && OverMaximumTemperature;
 
         public bool OverMinorThreshold => Temp >= Props.minorThreshold;
@@ -60,6 +61,7 @@ namespace FrontierDevelopments.General.Comps
         {
             base.PostSpawnSetup(respawningAfterLoad);
             if (_temperature < -KELVIN_ZERO_CELCIUS) _temperature = parent.AmbientTemperature;
+            if (_shutoffTemperature < -KELVIN_ZERO_CELCIUS) _shutoffTemperature = Props.minorThreshold;
             _dissipationRate = GenDate.TicksPerDay / Props.conductivity;
         }
 
@@ -102,6 +104,7 @@ namespace FrontierDevelopments.General.Comps
         {
             Scribe_Values.Look(ref _temperature, "temperature", -500f);
             Scribe_Values.Look(ref _thermalShutoff, "thermalShutoff", true);
+            Scribe_Values.Look(ref _shutoffTemperature, "shutoffTemperature", -500f);
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
