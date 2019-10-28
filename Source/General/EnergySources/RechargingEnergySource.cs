@@ -4,7 +4,6 @@ namespace FrontierDevelopments.General.EnergySources
 {
     public class CompProperties_RechargingEnergySource : CompProperties_SingleUseEnergySource
     {
-        public float rate;
         public float minimum;
         public float onlineRechargeAmount;
 
@@ -23,11 +22,6 @@ namespace FrontierDevelopments.General.EnergySources
         protected virtual float Rate => Props.rate;
 
         public override float MinimumCharge => Props.minimum;
-
-        public override bool IsActive()
-        {
-            return !_offlineRecharging && base.IsActive();
-        }
 
         public override void CompTick()
         {

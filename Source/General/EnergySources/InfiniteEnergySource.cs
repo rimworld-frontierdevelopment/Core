@@ -1,42 +1,34 @@
-using RimWorld;
+using FrontierDevelopments.General.Energy;
 using Verse;
 
 namespace FrontierDevelopments.General.EnergySources
 {
     public class CompProperties_InfiniteEnergySource : CompProperties
     {
+        public float rate = float.PositiveInfinity;
+
         public CompProperties_InfiniteEnergySource()
         {
             compClass = typeof(Comp_InfiniteEnergySource);
         }
     }
 
-    public class Comp_InfiniteEnergySource : ThingComp, IEnergySource
+    public class Comp_InfiniteEnergySource : ThingComp, IEnergyNode
     {
-        private CompFlickable _flickable;
+        private CompProperties_InfiniteEnergySource Props => (CompProperties_InfiniteEnergySource) props;
 
-        public float BaseConsumption { get => 0f; set {} }
-        public bool WantActive => _flickable?.SwitchIsOn ?? true;
-        public float EnergyAvailable => float.PositiveInfinity;
+        public float AmountAvailable => float.PositiveInfinity;
 
-        public bool IsActive()
+        public float RateAvailable => Props.rate;
+
+        public float Provide(float amount)
         {
-            return WantActive;
+            return 0f;
         }
 
-        public override void Initialize(CompProperties props)
+        public float Consume(float amount)
         {
-            base.Initialize(props);
-            _flickable = parent.GetComp<CompFlickable>();
-        }
-
-        public float Draw(float amount)
-        {
-            return IsActive() ? amount : 0f;
-        }
-
-        public void Drain(float amount)
-        {
+            return amount > RateAvailable ? RateAvailable : amount;
         }
     }
 }

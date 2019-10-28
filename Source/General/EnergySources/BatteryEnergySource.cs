@@ -1,3 +1,4 @@
+using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
 
@@ -10,33 +11,29 @@ namespace FrontierDevelopments.General.EnergySources
             compClass = typeof(BatteryEnergySource);
         }
     }
-    
-    public class BatteryEnergySource: ThingComp, IEnergySource
-    {
-        private float _baseConsumption;
 
+    public class BatteryEnergySource: ThingComp, IEnergyNode
+    {
         private CompPowerBattery Battery => parent.GetComp<CompPowerBattery>();
 
-        public bool IsActive()
+        public float Provide(float amount)
         {
-            return EnergyAvailable > 0;
+            var toStore = amount;
+
+            if (amount > Battery.AmountCanAccept)
+                toStore = Battery.AmountCanAccept;
+
+            Battery.AddEnergy(toStore);
+
+            return amount - toStore;
         }
 
-        public bool WantActive => true;
-
-        public float BaseConsumption
+        public float Consume(float amount)
         {
-            get => _baseConsumption;
-            set => _baseConsumption = value;
-        }
-
-        public float EnergyAvailable => Battery.StoredEnergy;
-        public float Draw(float amount)
-        {
-            if (amount > EnergyAvailable)
+            if (amount > AmountAvailable)
             {
-                Battery.DrawPower(EnergyAvailable);
-                return EnergyAvailable;
+                Battery.DrawPower(AmountAvailable);
+                return AmountAvailable;
             }
             else
             {
@@ -45,17 +42,8 @@ namespace FrontierDevelopments.General.EnergySources
             }
         }
 
-        public void Drain(float amount)
-        {
-            Draw(amount);
-        }
+        public float AmountAvailable => Battery.StoredEnergy;
 
-        public override void CompTick()
-        {
-            if (_baseConsumption > 0)
-            {
-                Battery.DrawPower(_baseConsumption);
-            }
-        }
+        public float RateAvailable => AmountAvailable;
     }
 }

@@ -1,3 +1,5 @@
+using System.Linq;
+using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
 
@@ -5,6 +7,7 @@ namespace FrontierDevelopments.General.EnergySources
 {
     public class CompProperties_ElectricEnergySource : CompProperties
     {
+        public float rate = float.PositiveInfinity;
         public float minimumOnlinePower;
         
         public CompProperties_ElectricEnergySource()
@@ -13,39 +16,49 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
     
-    public class Comp_ElectricEnergySource : ThingComp, IEnergySource
+    public class Comp_ElectricEnergySource : ThingComp, IEnergyNode
     {
-        private float _basePowerConsumption;
-        private float _additionalPowerDraw;
+        private float _drawThisTick;
 
         private CompPowerTrader _powerTrader;
 
         private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource) props;
 
-        public bool WantActive => _powerTrader?.PowerOn ?? true;
+        public float AmountAvailable => GainEnergyAvailable + StoredEnergyAvailable;
 
-        public bool IsActive()
+        public float RateAvailable
         {
-            return WantActive && EnergyAvailable >= Props.minimumOnlinePower;
-        }
-
-        public float BaseConsumption
-        {
-            get => _basePowerConsumption;
-            set
+            get
             {
-                _powerTrader.PowerOutput = value;
-                _basePowerConsumption = value;
+                if (!IsActive()) return 0f;
+                return RawRateAvailable;
             }
         }
 
-        public float GainEnergyAvailable => GainEnergyRate / GenDate.TicksPerDay;
+        private float RawRateAvailable
+        {
+            get
+            {
+                if (AmountAvailable > Props.rate) return Props.rate - _drawThisTick;
+                return AmountAvailable - _drawThisTick;
+            }
+        }
 
-        public float StoredEnergyAvailable => _powerTrader?.PowerNet?.CurrentStoredEnergy() ?? 0f;
+        private bool IsActive()
+        {
+            return Online() && RawRateAvailable >= Props.minimumOnlinePower;
+        }
+
+        private bool Online()
+        {
+            return _powerTrader != null && _powerTrader.PowerOn;
+        }
+
+        private float GainEnergyAvailable => GainEnergyRate / GenDate.TicksPerDay;
+
+        private float StoredEnergyAvailable => _powerTrader?.PowerNet?.CurrentStoredEnergy() ?? 0f;
 
         private float GainEnergyRate => _powerTrader?.PowerNet?.CurrentEnergyGainRate() ?? 0f;
-
-        public float EnergyAvailable => GainEnergyAvailable + StoredEnergyAvailable;
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
@@ -56,64 +69,54 @@ namespace FrontierDevelopments.General.EnergySources
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_Values.Look(ref _basePowerConsumption, "basePowerConsumption");
-            Scribe_Values.Look(ref _additionalPowerDraw, "additionalPowerDraw");
+            Scribe_Values.Look(ref _drawThisTick, "drawThisTick");
         }
 
         // Do the actual draw
         public override void CompTick()
         {
-            if (IsActive() && _additionalPowerDraw > 0f)
+            if (Online())
             {
-                var availThisTick = GainEnergyRate + StoredEnergyAvailable * GenDate.TicksPerDay;
-                var powerWanted = BaseConsumption - _additionalPowerDraw;
-                if (availThisTick + powerWanted < 0)
-                {
-                    powerWanted = -availThisTick;
-                }
-                _powerTrader.PowerOutput = powerWanted;
+                _powerTrader.PowerOutput = -_drawThisTick * GenDate.TicksPerDay;
             }
-            _additionalPowerDraw = 0;
-            base.CompTick();
+
+            _drawThisTick = 0;
         }
 
-        public void Drain(float amount)
+        public float Provide(float amount)
         {
-            if (_powerTrader?.PowerNet?.batteryComps != null)
+            return _powerTrader?.PowerNet?.batteryComps.Aggregate(0f, (stored, battery) =>
             {
-                var perBattery = amount / _powerTrader.PowerNet.batteryComps.Count;
-                _powerTrader.PowerNet.batteryComps.ForEach(battery => battery.DrawPower(perBattery));
-            }
+                var toStore = amount - stored;
+                if (toStore > battery.AmountCanAccept)
+                    toStore = battery.AmountCanAccept;
+                battery.AddEnergy(toStore);
+                return  stored + toStore;
+            }) ?? 0f;
         }
 
-        public float Draw(float amount)
+        public float Consume(float amount)
         {
             if (!IsActive()) return 0f;
-            amount *= GenDate.TicksPerDay;
-            var drawn = DrawPowerOneTick(amount);
-            _additionalPowerDraw += drawn;
-            return drawn;
-        }
 
-        /// <summary>
-        /// Checks and sets up the device to pull the instant draw during the next tick.
-        /// </summary>
-        /// <param name="amount">Amount to draw</param>
-        /// <returns>Amount of power drawn</returns>
-        private float DrawPowerOneTick(float amount)
-        {
-            if (_powerTrader.PowerNet == null) return 0f;
+            // figure out how much can be covered by network power
+            // this will have to wait until the next tick to resolve
+            // we can be at most that wrong if we attempt to overdraw for next tick
+            // TODO create a manager for PowerNets that can detect draw contention
+            var possibleShortFall = RateAvailable - amount;
             
-            // can this be feed by instantaneous draw? (who are we kidding, no way)
-            var gainPowerCovers = GainEnergyRate + BaseConsumption + amount;
-            if (gainPowerCovers >= 0) return amount;
-            var gainAndBatteriesCover = gainPowerCovers + StoredEnergyAvailable * GenDate.TicksPerDay;
-
-            // will batteries cover the difference?
-            if (gainAndBatteriesCover >= 0) return amount;
-
-            // uh-oh, energy shortfall
-            return amount - gainAndBatteriesCover;
+            if (possibleShortFall < 0)
+            {
+                // not enough energy is stored
+                _drawThisTick += -possibleShortFall;
+                return -possibleShortFall;
+            }
+            else
+            {
+                // good to go!
+                _drawThisTick += amount;
+                return amount;
+            }
         }
     }
 }

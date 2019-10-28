@@ -54,6 +54,10 @@
   <ItemGroup>
     <Compile Include="General\AssemblyUtility.cs" />
     <Compile Include="General\EnergySources\BatteryEnergySource.cs" />
+    <Compile Include="General\Energy\CompEnergyNet.cs" />
+    <Compile Include="General\Energy\EnergyNet.cs" />
+    <Compile Include="General\Energy\IEnergyNet.cs" />
+    <Compile Include="General\Energy\IEnergyNode.cs" />
     <Compile Include="General\Mod.cs" />
     <Compile Include="General\ModIntegration.cs" />
     <Compile Include="General\OwnershipUtility.cs" />
@@ -63,12 +67,10 @@
     <Compile Include="General\Comps\Comp_BatteryInternal.cs" />
     <Compile Include="General\Comps\Comp_HeatSink.cs" />
     <Compile Include="General\EnergySources\ElectricEnergySource.cs" />
-    <Compile Include="General\EnergySources\FixedEnergySource.cs" />
     <Compile Include="General\EnergySources\InfiniteEnergySource.cs" />
     <Compile Include="General\EnergySources\MechanoidEnergySource.cs" />
     <Compile Include="General\EnergySources\RechargingEnergySource.cs" />
     <Compile Include="General\EnergySources\SingleUseEnergySource.cs" />
-    <Compile Include="General\IEnergySource.cs" />
     <Compile Include="General\IHeatsink.cs" />
     <Compile Include="General\IncidentWorkers\IncidentWorker_HeatSinkOverTemperature.cs" />
     <Compile Include="General\Windows\Popup_IntSlider.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
 
@@ -149,10 +150,10 @@ namespace FrontierDevelopments.General.Comps
         
         private float MinorBreakdown()
         {
-            var energySource = EnergySourceUtility.Find(parent);
-            if (energySource == null) return 0;
-            var amount = energySource.EnergyAvailable * (float) new Random().NextDouble();
-            energySource.Drain(amount);
+            var energyNet = EnergyNet.Find(parent);
+            if (energyNet == null) return 0;
+            var amount = energyNet.RateAvailable * (float) new Random().NextDouble();
+            energyNet.Consume(amount);
             return amount;
         }
 
