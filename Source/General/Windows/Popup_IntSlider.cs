@@ -2,7 +2,7 @@
 using UnityEngine;
 using Verse;
 
-namespace FrontierDevelopments.Shields.Windows
+namespace FrontierDevelopments.General.Windows
 {
     public class Popup_IntSlider : Window
     {
