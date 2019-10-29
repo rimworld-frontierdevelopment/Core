@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Verse;
 
 namespace FrontierDevelopments.General.Energy
@@ -13,6 +14,8 @@ namespace FrontierDevelopments.General.Energy
     public class CompEnergyNet : ThingComp, IEnergyNet
     {
         private readonly EnergyNet _energyNet = new EnergyNet();
+
+        public IEnumerable<IEnergyNode> Nodes => _energyNet.Nodes;
 
         public void Connect(IEnergyNode node)
         {

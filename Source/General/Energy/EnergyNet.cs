@@ -38,6 +38,8 @@ namespace FrontierDevelopments.General.Energy
         
         private readonly HashSet<IEnergyNode> nodes = new HashSet<IEnergyNode>();
 
+        public IEnumerable<IEnergyNode> Nodes => nodes;
+
         public void Connect(IEnergyNode node)
         {
             nodes.Add(node);
