@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="General\AssemblyUtility.cs" />
+    <Compile Include="General\EnergySources\BaseEnergySource.cs" />
     <Compile Include="General\EnergySources\BatteryEnergySource.cs" />
     <Compile Include="General\Energy\CompEnergyNet.cs" />
     <Compile Include="General\Energy\EnergyNet.cs" />

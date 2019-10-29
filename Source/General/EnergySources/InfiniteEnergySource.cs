@@ -13,25 +13,24 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
 
-    public class Comp_InfiniteEnergySource : ThingComp, IEnergyNode
+    public class Comp_InfiniteEnergySource : BaseEnergySource
     {
         private CompProperties_InfiniteEnergySource Props => (CompProperties_InfiniteEnergySource) props;
 
-        public float AmountAvailable => float.PositiveInfinity;
+        public override float AmountAvailable => float.PositiveInfinity;
 
-        public float RateAvailable => Props.rate;
+        public override float TotalAvailable => float.PositiveInfinity;
 
-        public float TotalAvailable => float.PositiveInfinity;
+        public override float MaxRate => Props.rate;
 
-        public float MaxRate => Props.rate;
-
-        public float Provide(float amount)
+        public override float Provide(float amount)
         {
             return 0f;
         }
 
-        public float Consume(float amount)
+        public override float Consume(float amount)
         {
+            amount = base.Consume(amount);
             return amount > RateAvailable ? RateAvailable : amount;
         }
     }

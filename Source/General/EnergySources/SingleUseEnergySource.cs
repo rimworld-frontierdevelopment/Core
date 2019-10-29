@@ -1,6 +1,5 @@
 using FrontierDevelopments.General.Energy;
 using Verse;
-using Verse.Noise;
 
 namespace FrontierDevelopments.General.EnergySources
 {
@@ -15,26 +14,19 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
 
-    public class Comp_SingleUseEnergySource : ThingComp, IEnergyNode
+    public class Comp_SingleUseEnergySource : BaseEnergySource
     {
-        protected float _charge = -1f;
+        protected float _charge;
 
         private CompProperties_SingleUseEnergySource Props => (CompProperties_SingleUseEnergySource) props;
 
         public virtual float MinimumCharge => 0f;
 
-        public float AmountAvailable => _charge;
+        public override float AmountAvailable => _charge;
 
-        public float RateAvailable => Props.rate;
+        public override float TotalAvailable => Props.charge;
 
-        public float TotalAvailable => Props.charge;
-
-        public float MaxRate => Props.rate;
-
-        public float Provide(float amount)
-        {
-            return 0f;
-        }
+        public override float MaxRate => Props.rate;
 
         public override void Initialize(CompProperties props)
         {
@@ -49,11 +41,13 @@ namespace FrontierDevelopments.General.EnergySources
 
         public override void PostExposeData()
         {
-            Scribe_Values.Look(ref _charge, "charge", -1);
+            base.PostExposeData();
+            Scribe_Values.Look(ref _charge, "charge");
         }
 
-        public float Consume(float amount)
+        public override float Consume(float amount)
         {
+            amount = base.Consume(amount);
             if (amount >= _charge)
             {
                 _charge = 0f;

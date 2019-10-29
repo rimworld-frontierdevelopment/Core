@@ -6,17 +6,19 @@ namespace FrontierDevelopments.General.EnergySources
 {
     public class BatteryEnergySourceProperties : CompProperties
     {
+        public float rate = float.PositiveInfinity;
+
         public BatteryEnergySourceProperties()
         {
             compClass = typeof(BatteryEnergySource);
         }
     }
 
-    public class BatteryEnergySource: ThingComp, IEnergyNode
+    public class BatteryEnergySource: BaseEnergySource, IEnergyNode
     {
         private CompPowerBattery Battery => parent.GetComp<CompPowerBattery>();
 
-        public float Provide(float amount)
+        public override float Provide(float amount)
         {
             var toStore = amount;
 
@@ -28,8 +30,9 @@ namespace FrontierDevelopments.General.EnergySources
             return amount - toStore;
         }
 
-        public float Consume(float amount)
+        public override float Consume(float amount)
         {
+            amount = base.Consume(amount);
             if (amount > AmountAvailable)
             {
                 Battery.DrawPower(AmountAvailable);
@@ -42,12 +45,10 @@ namespace FrontierDevelopments.General.EnergySources
             }
         }
 
-        public float AmountAvailable => Battery.StoredEnergy;
+        public override float AmountAvailable => Battery.StoredEnergy;
 
-        public float RateAvailable => AmountAvailable;
+        public override float TotalAvailable => Battery.Props.storedEnergyMax;
 
-        public float TotalAvailable => Battery.Props.storedEnergyMax;
-
-        public float MaxRate => TotalAvailable;
+        public override float MaxRate => ((BatteryEnergySourceProperties)props).rate;
     }
 }

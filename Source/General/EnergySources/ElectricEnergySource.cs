@@ -16,42 +16,31 @@ namespace FrontierDevelopments.General.EnergySources
             compClass = typeof(Comp_ElectricEnergySource);
         }
     }
-    
-    public class Comp_ElectricEnergySource : ThingComp, IEnergyNode
-    {
-        private float _drawThisTick;
 
+    public class Comp_ElectricEnergySource : BaseEnergySource, IEnergyNode
+    {
         private CompPowerTrader _powerTrader;
 
         private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource) props;
+        
+        public override float AmountAvailable => GainEnergyAvailable + StoredEnergyAvailable;
 
-        public float AmountAvailable => GainEnergyAvailable + StoredEnergyAvailable;
-
-        public float RateAvailable
+        public override float RateAvailable
         {
             get
             {
                 if (!IsActive()) return 0f;
-                return RawRateAvailable;
+                return base.RateAvailable;
             }
         }
 
-        private float RawRateAvailable
-        {
-            get
-            {
-                if (AmountAvailable > Props.rate) return Props.rate - _drawThisTick;
-                return AmountAvailable - _drawThisTick;
-            }
-        }
+        public override float MaxRate => Math.Min(AmountAvailable * GenDate.TicksPerDay, Props.rate);
 
-        public float TotalAvailable => GainEnergyAvailable + StoredEnergyTotal;
-
-        public float MaxRate => Math.Min(Props.rate, TotalAvailable);
+        public override float TotalAvailable => GainEnergyAvailable + StoredEnergyTotal;
 
         private bool IsActive()
         {
-            return Online() && RawRateAvailable >= Props.minimumOnlinePower;
+            return Online() && base.RateAvailable >= Props.minimumOnlinePower;
         }
 
         private bool Online()
@@ -74,24 +63,18 @@ namespace FrontierDevelopments.General.EnergySources
             _powerTrader = parent.GetComp<CompPowerTrader>();
         }
 
-        public override void PostExposeData()
-        {
-            base.PostExposeData();
-            Scribe_Values.Look(ref _drawThisTick, "drawThisTick");
-        }
-
         // Do the actual draw
         public override void CompTick()
         {
             if (Online())
             {
-                _powerTrader.PowerOutput = -_drawThisTick * GenDate.TicksPerDay;
+                _powerTrader.PowerOutput = - (MaxRate - RateAvailable) * GenDate.TicksPerDay;
             }
 
-            _drawThisTick = 0;
+            base.CompTick();
         }
 
-        public float Provide(float amount)
+        public override float Provide(float amount)
         {
             return _powerTrader?.PowerNet?.batteryComps.Aggregate(0f, (stored, battery) =>
             {
@@ -103,26 +86,27 @@ namespace FrontierDevelopments.General.EnergySources
             }) ?? 0f;
         }
 
-        public float Consume(float amount)
+        public override float Consume(float amount)
         {
             if (!IsActive()) return 0f;
-
             // figure out how much can be covered by network power
             // this will have to wait until the next tick to resolve
             // we can be at most that wrong if we attempt to overdraw for next tick
             // TODO create a manager for PowerNets that can detect draw contention
-            var possibleShortFall = RateAvailable - amount;
+            var la = base.Consume(amount);
+
+            var possibleShortFall = amount - la;
+            
+            
             
             if (possibleShortFall < 0)
             {
                 // not enough energy is stored
-                _drawThisTick += -possibleShortFall;
                 return -possibleShortFall;
             }
             else
             {
                 // good to go!
-                _drawThisTick += amount;
                 return amount;
             }
         }
