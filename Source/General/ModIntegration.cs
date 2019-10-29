@@ -27,7 +27,7 @@ namespace FrontierDevelopments.General
                         if (assembly != null)
                         {
                             harmony.PatchAll(assembly);
-                            Log.Message(ThisModName + " :: enabled " + OtherModName + " support");
+                            Log.Message(ThisModName + " :: enabled " + OtherModName + " support for version " + version);
                             return true;
                         }
                         else
@@ -38,7 +38,7 @@ namespace FrontierDevelopments.General
                     else
                     {
                         Log.Warning(ThisModName + " :: " + OtherModName + " " + version + 
-                                    "is loaded and " + OtherModVersion + " is required, not enabling support");
+                                    " is loaded and " + OtherModVersion + " is required, not enabling support");
                     }
                 }
             }

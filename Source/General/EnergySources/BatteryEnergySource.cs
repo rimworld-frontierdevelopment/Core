@@ -45,5 +45,9 @@ namespace FrontierDevelopments.General.EnergySources
         public float AmountAvailable => Battery.StoredEnergy;
 
         public float RateAvailable => AmountAvailable;
+
+        public float TotalAvailable => Battery.Props.storedEnergyMax;
+
+        public float MaxRate => TotalAvailable;
     }
 }

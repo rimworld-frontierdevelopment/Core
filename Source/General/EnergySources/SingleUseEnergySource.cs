@@ -27,6 +27,10 @@ namespace FrontierDevelopments.General.EnergySources
 
         public float RateAvailable => Props.rate;
 
+        public float TotalAvailable => Props.charge;
+
+        public float MaxRate => Props.rate;
+
         public float Provide(float amount)
         {
             return 0f;

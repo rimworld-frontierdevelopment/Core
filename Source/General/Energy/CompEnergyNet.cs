@@ -26,6 +26,9 @@ namespace FrontierDevelopments.General.Energy
 
         public float AmountAvailable => _energyNet.AmountAvailable;
         public float RateAvailable => _energyNet.RateAvailable;
+        public float TotalAvailable => _energyNet.TotalAvailable;
+        public float MaxRate => _energyNet.MaxRate;
+
         public float Provide(float amount)
         {
             return _energyNet.Provide(amount);

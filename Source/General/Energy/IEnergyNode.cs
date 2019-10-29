@@ -6,11 +6,21 @@ namespace FrontierDevelopments.General.Energy
         /// Amount of energy the network can provide.
         /// </summary>
         float AmountAvailable { get; }
+        
+        /// <summary>
+        /// Total amount of energy the node can provide.
+        /// </summary>
+        float TotalAvailable { get; }
 
         /// <summary>
         /// Amount of energy the network can provide per tick.
         /// </summary>
         float RateAvailable { get; }
+        
+        /// <summary>
+        /// The maximum rate the node can provide.
+        /// </summary>
+        float MaxRate { get; }
 
         /// <summary>
         /// Provide the net work with energy.

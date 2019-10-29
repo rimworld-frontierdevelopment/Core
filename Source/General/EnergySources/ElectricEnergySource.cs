@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using FrontierDevelopments.General.Energy;
 using RimWorld;
@@ -44,6 +45,10 @@ namespace FrontierDevelopments.General.EnergySources
             }
         }
 
+        public float TotalAvailable => GainEnergyAvailable + StoredEnergyTotal;
+
+        public float MaxRate => Math.Min(Props.rate, TotalAvailable);
+
         private bool IsActive()
         {
             return Online() && RawRateAvailable >= Props.minimumOnlinePower;
@@ -57,6 +62,9 @@ namespace FrontierDevelopments.General.EnergySources
         private float GainEnergyAvailable => GainEnergyRate / GenDate.TicksPerDay;
 
         private float StoredEnergyAvailable => _powerTrader?.PowerNet?.CurrentStoredEnergy() ?? 0f;
+
+        private float StoredEnergyTotal =>
+            _powerTrader?.PowerNet?.batteryComps.Aggregate(0f, (sum, battery) => sum + battery.Props.storedEnergyMax) ?? 0f;
 
         private float GainEnergyRate => _powerTrader?.PowerNet?.CurrentEnergyGainRate() ?? 0f;
 

@@ -52,6 +52,10 @@ namespace FrontierDevelopments.General.Energy
         
         public float RateAvailable => nodes.Aggregate(0f, (sum, node) => sum + node.RateAvailable);
 
+        public float TotalAvailable => nodes.Aggregate(0f, (sum, node) => sum + node.TotalAvailable);
+
+        public float MaxRate => nodes.Aggregate(0f, (sum, node) => sum + node.MaxRate);
+
         private float HandleEnergy(float amount, Func<IEnergyNode, float, float> callback)
         {
             if (amount < 0) throw new InvalidOperationException("Can't provide a negative amount");
