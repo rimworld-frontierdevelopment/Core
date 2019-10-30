@@ -52,7 +52,10 @@ namespace FrontierDevelopments.General.Energy
 
         public EnergyNet()
         {
-            _id = NextId;
+            if (Scribe.mode == LoadSaveMode.Inactive)
+            {
+                _id = NextId;
+            }
         }
 
         public void Connect(IEnergyNode node)
