@@ -51,6 +51,12 @@ namespace FrontierDevelopments.General.Energy
 
         public void Update()
         {
+            switch (parent)
+            {
+                case Pawn pawn:
+                    if (Find.WorldPawns.Contains(pawn)) return;
+                    break;
+            }
             _energyNet.Update();
         }
 
