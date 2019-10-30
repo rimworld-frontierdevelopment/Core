@@ -23,14 +23,14 @@ namespace FrontierDevelopments.General.Windows
 
         protected override void SetInitialSizeAndPosition()
         {
-            var vector = UI.MousePositionOnUIInverted;
-            if (vector.x + InitialSize.x > UI.screenWidth)
+            var vector = Verse.UI.MousePositionOnUIInverted;
+            if (vector.x + InitialSize.x > Verse.UI.screenWidth)
             {
-                vector.x = UI.screenWidth - InitialSize.x;
+                vector.x = Verse.UI.screenWidth - InitialSize.x;
             }
-            if (vector.y + InitialSize.y - 50 > UI.screenHeight)
+            if (vector.y + InitialSize.y - 50 > Verse.UI.screenHeight)
             {
-                vector.y = UI.screenHeight - InitialSize.y - 50;
+                vector.y = Verse.UI.screenHeight - InitialSize.y - 50;
             }
             windowRect = new Rect(vector.x, vector.y + InitialSize.y - 100, 215, 75);
         }
