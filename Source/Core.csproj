@@ -57,8 +57,10 @@
     <Compile Include="General\EnergySources\BatteryEnergySource.cs" />
     <Compile Include="General\Energy\CompEnergyNet.cs" />
     <Compile Include="General\Energy\EnergyNet.cs" />
+    <Compile Include="General\Energy\IEnergyConsumer.cs" />
     <Compile Include="General\Energy\IEnergyNet.cs" />
     <Compile Include="General\Energy\IEnergyNode.cs" />
+    <Compile Include="General\Energy\IEnergyProvider.cs" />
     <Compile Include="General\Mod.cs" />
     <Compile Include="General\ModIntegration.cs" />
     <Compile Include="General\OwnershipUtility.cs" />

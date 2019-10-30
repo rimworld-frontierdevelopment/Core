@@ -13,8 +13,10 @@ namespace FrontierDevelopments.General.Energy
 
     public class CompEnergyNet : ThingComp, IEnergyNet
     {
-        private readonly EnergyNet _energyNet = new EnergyNet();
+        private EnergyNet _energyNet = new EnergyNet();
 
+        public IEnergyNet Parent => _energyNet.Parent;
+        
         public IEnumerable<IEnergyNode> Nodes => _energyNet.Nodes;
 
         public void Connect(IEnergyNode node)
@@ -25,6 +27,11 @@ namespace FrontierDevelopments.General.Energy
         public void Disconnect(IEnergyNode node)
         {
             _energyNet.Disconnect(node);
+        }
+
+        public void ConnectTo(IEnergyNet net)
+        {
+            _energyNet.ConnectTo(net);
         }
 
         public float AmountAvailable => _energyNet.AmountAvailable;
@@ -40,6 +47,37 @@ namespace FrontierDevelopments.General.Energy
         public float Consume(float amount)
         {
             return _energyNet.Consume(amount);
+        }
+
+        public void Update()
+        {
+            _energyNet.Update();
+        }
+
+        public void Changed()
+        {
+            _energyNet.Changed();
+        }
+
+        public override void CompTick()
+        {
+            Update();
+        }
+
+        public float Rate => _energyNet.Rate;
+        public void HasPower(bool isPowered)
+        {
+            _energyNet.HasPower(isPowered);
+        }
+
+        public string GetUniqueLoadID()
+        {
+            return _energyNet.GetUniqueLoadID();
+        }
+
+        public override void PostExposeData()
+        {
+            Scribe_Deep.Look(ref _energyNet, "energyNet");
         }
     }
 }

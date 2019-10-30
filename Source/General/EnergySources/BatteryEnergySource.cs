@@ -1,4 +1,3 @@
-using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
 
@@ -14,8 +13,11 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
 
-    public class BatteryEnergySource: BaseEnergySource, IEnergyNode
+    
+    public class BatteryEnergySource: BaseEnergySource
     {
+        protected override string SaveKey => "BatterySource";
+
         private CompPowerBattery Battery => parent.GetComp<CompPowerBattery>();
 
         public override float Provide(float amount)

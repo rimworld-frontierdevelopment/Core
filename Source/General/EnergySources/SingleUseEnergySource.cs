@@ -1,4 +1,3 @@
-using FrontierDevelopments.General.Energy;
 using Verse;
 
 namespace FrontierDevelopments.General.EnergySources
@@ -16,6 +15,8 @@ namespace FrontierDevelopments.General.EnergySources
 
     public class Comp_SingleUseEnergySource : BaseEnergySource
     {
+        protected override string SaveKey => "SingleUseSource";
+        
         protected float _charge;
 
         private CompProperties_SingleUseEnergySource Props => (CompProperties_SingleUseEnergySource) props;

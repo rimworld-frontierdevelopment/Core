@@ -1,16 +1,30 @@
+using System;
+using System.Linq;
 using FrontierDevelopments.General.Energy;
 using Verse;
 
 namespace FrontierDevelopments.General.EnergySources
 {
-    public abstract class BaseEnergySource : ThingComp, IEnergyNode
+    public abstract class BaseEnergySource : ThingComp, IEnergyProvider
     {
         private float _drawThisTick;
+        private IEnergyNet _parent;
 
-        public virtual float AmountAvailable { get; }
-        public virtual float TotalAvailable { get; }
-        public virtual float RateAvailable => MaxRate - _drawThisTick;
-        public virtual float MaxRate { get; }
+        public IEnergyNet Parent => _parent;
+
+        public virtual float AmountAvailable => throw new Exception();
+        public virtual float TotalAvailable => throw new Exception();
+        public virtual float RateAvailable => Math.Min(MaxRate - _drawThisTick, AmountAvailable);
+        public virtual float MaxRate => throw new Exception();
+
+        protected abstract string SaveKey { get; }
+
+        public void ConnectTo(IEnergyNet net)
+        {
+            _parent?.Disconnect(this);
+            _parent = net;
+            _parent?.Connect(this);
+        }
 
         public virtual float Provide(float amount)
         {
@@ -24,14 +38,32 @@ namespace FrontierDevelopments.General.EnergySources
             return amount;
         }
 
-        public override void CompTick()
+        public override void PostSpawnSetup(bool respawningAfterLoad)
+        {
+            ConnectTo(parent.AllComps.OfType<IEnergyNet>().First());
+            base.PostSpawnSetup(respawningAfterLoad);
+            
+        }
+
+        public override void PostDeSpawn(Map map)
+        {
+            _parent?.Disconnect(this);
+        }
+
+        public void Update()
         {
             _drawThisTick = 0;
         }
 
         public override void PostExposeData()
         {
-            Scribe_Values.Look(ref _drawThisTick, "drawThisTick");
+            Scribe_References.Look(ref _parent, SaveKey + "NetParent");
+            Scribe_Values.Look(ref _drawThisTick, SaveKey + "DrawThisTick");
+            
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                ConnectTo(_parent);
+            }
         }
     }
 }

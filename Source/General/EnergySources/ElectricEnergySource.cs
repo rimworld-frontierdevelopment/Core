@@ -17,8 +17,10 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
 
-    public class Comp_ElectricEnergySource : BaseEnergySource, IEnergyNode
+    public class Comp_ElectricEnergySource : BaseEnergySource
     {
+        protected override string SaveKey => "ElectricSource";
+        
         private CompPowerTrader _powerTrader;
 
         private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource) props;

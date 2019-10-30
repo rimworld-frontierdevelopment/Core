@@ -15,6 +15,8 @@ namespace FrontierDevelopments.General.EnergySources
 
     public class Comp_InfiniteEnergySource : BaseEnergySource
     {
+        protected override string SaveKey => "InfiniteSource";
+        
         private CompProperties_InfiniteEnergySource Props => (CompProperties_InfiniteEnergySource) props;
 
         public override float AmountAvailable => float.PositiveInfinity;

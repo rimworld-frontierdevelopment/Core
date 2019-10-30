@@ -15,19 +15,21 @@ namespace FrontierDevelopments.General.EnergySources
 
     public class Comp_RechargingEnergySource : Comp_SingleUseEnergySource
     {
+        protected override string SaveKey => "RechargingSource";
+        
         private bool _offlineRecharging;
         
         private CompProperties_RechargingEnergySource Props => (CompProperties_RechargingEnergySource) props;
 
-        protected virtual float Rate => Props.rate;
+        protected virtual float ChargeRate => Props.rate;
 
         public override float MinimumCharge => Props.minimum;
 
         public override void CompTick()
         {
-            if (_charge + Rate <= Props.charge)
+            if (_charge + ChargeRate <= Props.charge)
             {
-                _charge += Rate;
+                _charge += ChargeRate;
             }
             else
             {
