@@ -93,13 +93,16 @@ namespace FrontierDevelopments.General.Energy
 
         public float MaxRate => CanProvide(provider => provider.MaxRate);
 
-        private float HandleEnergy(float amount, Func<IEnergyProvider, float, float> callback)
+        private float HandleEnergy(
+            float amount, 
+            IEnumerable<IEnergyProvider> providers, 
+            Func<IEnergyProvider, float, float> callback)
         {
             if (amount < 0) throw new InvalidOperationException("Can't provide a negative amount");
 
             var remaining = amount;
 
-            foreach (var node in nodes.OfType<IEnergyProvider>())
+            foreach (var node in providers)
             {
                 if (remaining <= 0) break;
                 var handled = callback(node, remaining);
@@ -112,12 +115,22 @@ namespace FrontierDevelopments.General.Energy
         
         public float Provide(float amount)
         {
-            return HandleEnergy(amount, (node, remaining) => node.Provide(remaining));
+            return HandleEnergy(
+                amount,
+                nodes
+                    .OfType<IEnergyProvider>()
+                    .OrderBy(provider => provider.AmountAvailable), 
+                (node, remaining) => node.Provide(remaining));
         }
 
         public float Consume(float amount)
         {
-            var result = HandleEnergy(amount, (node, remaining) => node.Consume(remaining));
+            var result = HandleEnergy(
+                amount,
+                nodes
+                    .OfType<IEnergyProvider>()
+                    .OrderByDescending(provider => provider.AmountAvailable),
+                (node, remaining) => node.Consume(remaining));
             if (result < amount) _draw += amount - result;
             return result;
         }
