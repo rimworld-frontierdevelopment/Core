@@ -4,5 +4,6 @@ namespace FrontierDevelopments.General.Energy
     {
         IEnergyNet Parent { get; }
         void ConnectTo(IEnergyNet net);
+        void Disconnect();
     }
 }

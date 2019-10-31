@@ -79,6 +79,12 @@ namespace FrontierDevelopments.General.Energy
             _parent?.Connect(this);
         }
 
+        public void Disconnect()
+        {
+            _parent?.Disconnect();
+            _parent = null;
+        }
+
         private float CanProvide(Func<IEnergyProvider, float> callback)
         {
             return nodes.OfType<IEnergyProvider>().Aggregate(0f, (sum, node) => sum + callback(node)) 

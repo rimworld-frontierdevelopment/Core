@@ -34,6 +34,11 @@ namespace FrontierDevelopments.General.Energy
             _energyNet.ConnectTo(net);
         }
 
+        public void Disconnect()
+        {
+            _energyNet.Disconnect();
+        }
+
         public float AmountAvailable => _energyNet.AmountAvailable;
         public float RateAvailable => _energyNet.RateAvailable;
         public float TotalAvailable => _energyNet.TotalAvailable;

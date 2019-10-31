@@ -26,6 +26,12 @@ namespace FrontierDevelopments.General.EnergySources
             _parent?.Connect(this);
         }
 
+        public void Disconnect()
+        {
+            _parent?.Disconnect(this);
+            _parent = null;
+        }
+
         public virtual float Provide(float amount)
         {
             return 0f;
