@@ -46,7 +46,7 @@ namespace FrontierDevelopments.General.EnergySources
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
-            ConnectTo(parent.AllComps.OfType<IEnergyNet>().First());
+            ConnectTo(parent.AllComps.OfType<Object>().Concat(parent).OfType<IEnergyNet>().First());
             base.PostSpawnSetup(respawningAfterLoad);
             
         }
