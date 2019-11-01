@@ -3,6 +3,7 @@ using System.Linq;
 using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
+using Verse.Noise;
 
 namespace FrontierDevelopments.General.EnergySources
 {
@@ -36,7 +37,7 @@ namespace FrontierDevelopments.General.EnergySources
             }
         }
 
-        public override float MaxRate => Math.Min(AmountAvailable * GenDate.TicksPerDay, Props.rate);
+        public override float MaxRate => Math.Min(AmountAvailable, Props.rate);
 
         public override float TotalAvailable => GainEnergyAvailable + StoredEnergyTotal;
 
