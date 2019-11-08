@@ -39,6 +39,11 @@ namespace FrontierDevelopments.General.EnergySources
 
         public virtual float Consume(float amount)
         {
+            return Request(amount);
+        }
+
+        public virtual float Request(float amount)
+        {
             if (amount > RateAvailable) amount = RateAvailable;
             _drawThisTick += amount;
             return amount;

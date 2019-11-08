@@ -54,6 +54,11 @@ namespace FrontierDevelopments.General.Energy
             return _energyNet.Consume(amount);
         }
 
+        public float Request(float amount)
+        {
+            return _energyNet.Request(amount);
+        }
+
         public void Update()
         {
             switch (parent)

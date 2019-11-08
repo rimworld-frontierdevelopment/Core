@@ -29,6 +29,13 @@ namespace FrontierDevelopments.General.Energy
         /// <param name="amount">Amount requested</param>
         /// <returns>Energy consumed</returns>
         float Consume(float amount);
+
+        /// <summary>
+        /// Requests energy from the network.
+        /// </summary>
+        /// <param name="amount">Amount requested</param>
+        /// <returns>Energy available</returns>
+        float Request(float amount);
         
         /// <summary>
         /// Provide the net work with energy.
@@ -37,7 +44,6 @@ namespace FrontierDevelopments.General.Energy
         /// <returns>Energy stored</returns>
         float Provide(float amount);
 
-        
         /// <summary>
         /// Called by the energy net during updates. Resets any state for each tick.
         /// </summary>

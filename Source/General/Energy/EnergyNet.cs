@@ -141,7 +141,19 @@ namespace FrontierDevelopments.General.Energy
             return result;
         }
 
-        public void Update()
+        public float Request(float amount)
+        {
+            var result = HandleEnergy(
+                amount,
+                nodes
+                    .OfType<IEnergyProvider>()
+                    .OrderByDescending(provider => provider.AmountAvailable),
+                (node, remaining) => node.Request(remaining));
+            if (result < amount) _draw += amount - result;
+            return result;
+        }
+
+        private void CalculateConsumption(Action<IEnergyConsumer> consumerAction)
         {
             _draw = 0;
             nodes.OfType<IEnergyProvider>().Do(provider => provider.Update());
@@ -154,15 +166,23 @@ namespace FrontierDevelopments.General.Energy
                 else
                 {
                     consumer.HasPower(true);
-                    Consume(consumer.Rate);
+                    consumerAction.Invoke(consumer);
                 }
             });
+        }
+
+        public void Update()
+        {
+            CalculateConsumption(consumer => Consume(consumer.Rate));
         }
 
         public void Changed()
         {
             if (_parent != null) _parent.Changed();
-            else Update();
+            else
+            {
+                CalculateConsumption(consumer => Request(consumer.Rate));
+            }
         }
 
         public float Rate => _draw;
