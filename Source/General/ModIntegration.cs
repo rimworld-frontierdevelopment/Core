@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -13,7 +13,7 @@ namespace FrontierDevelopments.General
         public virtual Version OtherModVersion { get; }
         public virtual string IntegrationAssemblyPath { get; }
 
-        public bool TryEnable(HarmonyInstance harmony)
+        public bool TryEnable(Harmony harmony)
         {
             try
             {

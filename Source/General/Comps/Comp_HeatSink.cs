@@ -78,8 +78,14 @@ namespace FrontierDevelopments.General.Comps
 
         protected virtual void DissipateHeat(float kilojoules)
         {
-            GenTemperature.PushHeat(parent, kilojoules);
-        }
+            try
+            {
+                GenTemperature.PushHeat(parent, kilojoules);
+            } catch(Exception e)
+            {
+                // This fixes a NRE related to minify-everything
+            }
+        } 
 
         public override void CompTick()
         {
