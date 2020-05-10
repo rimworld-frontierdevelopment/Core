@@ -1,9 +1,7 @@
+using RimWorld;
 using System;
 using System.Linq;
-using FrontierDevelopments.General.Energy;
-using RimWorld;
 using Verse;
-using Verse.Noise;
 
 namespace FrontierDevelopments.General.EnergySources
 {
@@ -11,7 +9,7 @@ namespace FrontierDevelopments.General.EnergySources
     {
         public float rate = float.PositiveInfinity;
         public float minimumOnlinePower;
-        
+
         public CompProperties_ElectricEnergySource()
         {
             compClass = typeof(Comp_ElectricEnergySource);
@@ -21,11 +19,11 @@ namespace FrontierDevelopments.General.EnergySources
     public class Comp_ElectricEnergySource : BaseEnergySource
     {
         protected override string SaveKey => "ElectricSource";
-        
+
         private CompPowerTrader _powerTrader;
 
-        private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource) props;
-        
+        private CompProperties_ElectricEnergySource Props => (CompProperties_ElectricEnergySource)props;
+
         public override float AmountAvailable => GainEnergyAvailable + StoredEnergyAvailable;
 
         public override float RateAvailable
@@ -71,7 +69,7 @@ namespace FrontierDevelopments.General.EnergySources
         {
             if (Online())
             {
-                _powerTrader.PowerOutput = - (MaxRate - RateAvailable) * GenDate.TicksPerDay;
+                _powerTrader.PowerOutput = -(MaxRate - RateAvailable) * GenDate.TicksPerDay;
             }
 
             base.CompTick();
@@ -85,7 +83,7 @@ namespace FrontierDevelopments.General.EnergySources
                 if (toStore > battery.AmountCanAccept)
                     toStore = battery.AmountCanAccept;
                 battery.AddEnergy(toStore);
-                return  stored + toStore;
+                return stored + toStore;
             }) ?? 0f;
         }
 
@@ -99,9 +97,7 @@ namespace FrontierDevelopments.General.EnergySources
             var la = base.Consume(amount);
 
             var possibleShortFall = amount - la;
-            
-            
-            
+
             if (possibleShortFall < 0)
             {
                 // not enough energy is stored

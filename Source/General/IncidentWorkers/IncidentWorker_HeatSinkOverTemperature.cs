@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FrontierDevelopments.General.Comps;
+﻿using FrontierDevelopments.General.Comps;
 using RimWorld;
+using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace FrontierDevelopments.General.IncidentWorkers
@@ -20,22 +20,22 @@ namespace FrontierDevelopments.General.IncidentWorkers
             }
         }
 
-        protected override bool CanFireNowSub(IncidentParms parms)
+        public override bool CanFireNowSub(IncidentParms parms)
         {
-            return Settings.EnableThermal 
+            return Settings.EnableThermal
                    && GetTargets((Map)parms.target).Any();
         }
 
-        protected override bool TryExecuteWorker(IncidentParms parms)
+        public override bool TryExecuteWorker(IncidentParms parms)
         {
-            var map = (Map) parms.target;
+            var map = (Map)parms.target;
             var target = GetTargets(map).RandomElement();
 
             if (Settings.EnableCriticalThermalIncidents && target.OverCriticalThreshold)
             {
                 target.DoCriticalBreakdown();
                 return true;
-            } 
+            }
             if (Settings.EnableMajorThermalIncidents && target.OverMajorThreshold)
             {
                 target.DoMajorBreakdown();

@@ -11,8 +11,7 @@ namespace FrontierDevelopments.General
         {
             try
             {
-                var modMetaData = ModLister.AllInstalledMods
-                    .First(mod => mod.Active && mod.Name == modName);
+                var modMetaData = ModLister.AllInstalledMods.First(mod => mod.Active && mod.Name == modName);
                 return Assembly.LoadFrom(modMetaData.RootDir.FullName + "/" + pathInModFolder);
             }
             catch (Exception)

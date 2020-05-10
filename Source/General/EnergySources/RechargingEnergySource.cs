@@ -16,10 +16,10 @@ namespace FrontierDevelopments.General.EnergySources
     public class Comp_RechargingEnergySource : Comp_SingleUseEnergySource
     {
         protected override string SaveKey => "RechargingSource";
-        
+
         private bool _offlineRecharging;
-        
-        private CompProperties_RechargingEnergySource Props => (CompProperties_RechargingEnergySource) props;
+
+        private CompProperties_RechargingEnergySource Props => (CompProperties_RechargingEnergySource)props;
 
         protected virtual float ChargeRate => Props.rate;
 

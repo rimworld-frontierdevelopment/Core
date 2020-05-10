@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using FrontierDevelopments.General.Energy;
+using System.Collections.Generic;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -9,6 +9,7 @@ namespace FrontierDevelopments.General
         IEnumerable<IEnergyNode> Nodes { get; }
 
         void Connect(IEnergyNode node);
+
         void Disconnect(IEnergyNode node);
 
         /// <summary>

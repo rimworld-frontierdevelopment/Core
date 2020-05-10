@@ -6,7 +6,6 @@ namespace FrontierDevelopments.General
     {
         public Mod(ModContentPack content) : base(content)
         {
-            
         }
     }
 }

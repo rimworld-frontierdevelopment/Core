@@ -1,7 +1,7 @@
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Harmony;
 using Verse;
 
 namespace FrontierDevelopments.General.Energy
@@ -14,8 +14,10 @@ namespace FrontierDevelopments.General.Energy
             {
                 case IEnergyNet parentSource:
                     return parentSource;
+
                 case ThingWithComps thingWithComps:
                     return FindComp(thingWithComps.AllComps);
+
                 default:
                     return null;
             }
@@ -34,7 +36,7 @@ namespace FrontierDevelopments.General.Energy
         }
 
         private static int NextId => Verse.Find.UniqueIDsManager.GetNextThingID();
-        
+
         //
         //
         //
@@ -87,21 +89,21 @@ namespace FrontierDevelopments.General.Energy
 
         private float CanProvide(Func<IEnergyProvider, float> callback)
         {
-            return nodes.OfType<IEnergyProvider>().Aggregate(0f, (sum, node) => sum + callback(node)) 
+            return nodes.OfType<IEnergyProvider>().Aggregate(0f, (sum, node) => sum + callback(node))
                    + (_netPowered && _parent != null ? callback(_parent) : 0f);
         }
 
-        public float AmountAvailable => CanProvide(provider => provider.AmountAvailable); 
+        public float AmountAvailable => CanProvide(provider => provider.AmountAvailable);
 
-        public float RateAvailable => CanProvide(provider => provider.RateAvailable); 
+        public float RateAvailable => CanProvide(provider => provider.RateAvailable);
 
         public float TotalAvailable => CanProvide(provider => provider.TotalAvailable);
 
         public float MaxRate => CanProvide(provider => provider.MaxRate);
 
         private float HandleEnergy(
-            float amount, 
-            IEnumerable<IEnergyProvider> providers, 
+            float amount,
+            IEnumerable<IEnergyProvider> providers,
             Func<IEnergyProvider, float, float> callback)
         {
             if (amount < 0) throw new InvalidOperationException("Can't provide a negative amount");
@@ -118,14 +120,14 @@ namespace FrontierDevelopments.General.Energy
 
             return amount - remaining;
         }
-        
+
         public float Provide(float amount)
         {
             return HandleEnergy(
                 amount,
                 nodes
                     .OfType<IEnergyProvider>()
-                    .OrderBy(provider => provider.AmountAvailable), 
+                    .OrderBy(provider => provider.AmountAvailable),
                 (node, remaining) => node.Provide(remaining));
         }
 
@@ -186,7 +188,7 @@ namespace FrontierDevelopments.General.Energy
         }
 
         public float Rate => _draw;
-        
+
         public void HasPower(bool isPowered)
         {
             var last = _netPowered;
@@ -205,7 +207,7 @@ namespace FrontierDevelopments.General.Energy
             Scribe_References.Look(ref _parent, "parent");
             Scribe_Values.Look(ref _netPowered, "netPowered");
             Scribe_Values.Look(ref _draw, "draw");
-            
+
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 ConnectTo(_parent);

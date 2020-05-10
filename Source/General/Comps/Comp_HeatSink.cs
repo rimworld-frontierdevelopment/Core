@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FrontierDevelopments.General.Energy;
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using FrontierDevelopments.General.Energy;
-using RimWorld;
 using Verse;
 
 namespace FrontierDevelopments.General.Comps
@@ -23,7 +23,7 @@ namespace FrontierDevelopments.General.Comps
             compClass = typeof(Comp_HeatSink);
         }
     }
-    
+
     public class Comp_HeatSink : ThingComp, IHeatsink
     {
         public static readonly float KELVIN_ZERO_CELCIUS = 273.15f;
@@ -34,24 +34,24 @@ namespace FrontierDevelopments.General.Comps
         private float _shutoffTemperature = -500f;
 
         public bool CanBreakdown => !_thermalShutoff && OverMinorThreshold;
-        
+
         public CompProperties_HeatSink Props => (CompProperties_HeatSink)props;
 
-        public float Temp => _temperature; 
+        public float Temp => _temperature;
 
         private float Joules
         {
             get => (_temperature + KELVIN_ZERO_CELCIUS) * Props.specificHeat * Props.grams;
-            set =>  _temperature = value / Props.specificHeat / Props.grams - KELVIN_ZERO_CELCIUS;
+            set => _temperature = value / Props.specificHeat / Props.grams - KELVIN_ZERO_CELCIUS;
         }
 
         public bool OverTemperature => _thermalShutoff && Temp > _shutoffTemperature
                                        || !Settings.EnableCriticalThermalIncidents && OverMaximumTemperature;
 
         public bool OverMinorThreshold => Temp >= Props.minorThreshold;
-        
+
         public bool OverMajorThreshold => Temp >= Props.majorThreshold;
-        
+
         public bool OverCriticalThreshold => Temp >= Props.criticalThreshold;
 
         public bool OverMaximumTemperature => Temp >= MaximumTemperature;
@@ -78,7 +78,13 @@ namespace FrontierDevelopments.General.Comps
 
         protected virtual void DissipateHeat(float kilojoules)
         {
-            GenTemperature.PushHeat(parent, kilojoules);
+            try
+            {
+                GenTemperature.PushHeat(parent, kilojoules);
+            } catch(Exception e)
+            {
+                // This will error when a shield is minified, as parent.Map will be null
+            }
         }
 
         public override void CompTick()
@@ -89,7 +95,7 @@ namespace FrontierDevelopments.General.Comps
             }
             else
             {
-                var heatDissipated =  (Temp - AmbientTemp()) / _dissipationRate;
+                var heatDissipated = (Temp - AmbientTemp()) / _dissipationRate;
                 Joules -= heatDissipated * 1000f;
                 DissipateHeat(heatDissipated);
             }
@@ -114,7 +120,7 @@ namespace FrontierDevelopments.General.Comps
             {
                 yield return new Command_Toggle
                 {
-//                    icon = Resources.UiThermalShutoff,
+                    //                    icon = Resources.UiThermalShutoff,
                     defaultDesc = "thermal_shutoff.description".Translate(),
                     defaultLabel = "thermal_shutoff.label".Translate(),
                     isActive = () => _thermalShutoff,
@@ -126,33 +132,33 @@ namespace FrontierDevelopments.General.Comps
         public void DoMinorBreakdown()
         {
             BreakdownMessage(
-                "fd.shields.incident.minor.title".Translate(), 
-                "fd.shields.incident.minor.body".Translate(), 
+                "fd.shields.incident.minor.title".Translate(),
+                "fd.shields.incident.minor.body".Translate(),
                 MinorBreakdown());
         }
 
         public void DoMajorBreakdown()
         {
             BreakdownMessage(
-                "fd.shields.incident.major.title".Translate(), 
-                "fd.shields.incident.major.body".Translate(), 
+                "fd.shields.incident.major.title".Translate(),
+                "fd.shields.incident.major.body".Translate(),
                 MajorBreakdown());
         }
 
         public void DoCriticalBreakdown()
         {
             BreakdownMessage(
-                "fd.shields.incident.critical.title".Translate(), 
-                "fd.shields.incident.critical.body".Translate(), 
+                "fd.shields.incident.critical.title".Translate(),
+                "fd.shields.incident.critical.body".Translate(),
                 CriticalBreakdown());
             parent.Destroy(DestroyMode.KillFinalize);
         }
-        
+
         private float MinorBreakdown()
         {
             var energyNet = EnergyNet.Find(parent);
             if (energyNet == null) return 0;
-            var amount = energyNet.RateAvailable * (float) new Random().NextDouble();
+            var amount = energyNet.RateAvailable * (float)new Random().NextDouble();
             energyNet.Consume(amount);
             return amount;
         }
@@ -168,7 +174,6 @@ namespace FrontierDevelopments.General.Comps
                     Find.LetterStack.RemoveLetter(
                         Find.LetterStack.LettersListForReading
                             .First(letter => letter.lookTargets.targets.Any(t => t.Thing == parent)));
-                    
                 }
                 catch (Exception)
                 {
@@ -187,14 +192,14 @@ namespace FrontierDevelopments.General.Comps
                 parent);
             return MajorBreakdown();
         }
-        
+
         private void BreakdownMessage(string title, string body, float drained)
         {
             if (!OwnershipUtility.PlayerOwns(parent)) return;
             Find.LetterStack.ReceiveLetter(
                 title,
-                body.Replace("{0}", ((int)drained).ToString()), 
-                LetterDefOf.NegativeEvent, 
+                body.Replace("{0}", ((int)drained).ToString()),
+                LetterDefOf.NegativeEvent,
                 new TargetInfo(parent.Position, parent.Map));
         }
     }

@@ -11,7 +11,7 @@ namespace FrontierDevelopments.General.Windows
         private readonly int _ceiling;
         private readonly Func<int> _current;
         private readonly Action<int> _callback;
-
+        //public override Vector2 InitialSize => new Vector2(100f, 100f);
         public Popup_IntSlider(string label, int floor, int ceiling, Func<int> current, Action<int> callback)
         {
             _label = label;
@@ -21,9 +21,10 @@ namespace FrontierDevelopments.General.Windows
             _callback = callback;
         }
 
-        protected override void SetInitialSizeAndPosition()
+        public override void SetInitialSizeAndPosition()
         {
             var vector = Verse.UI.MousePositionOnUIInverted;
+
             if (vector.x + InitialSize.x > Verse.UI.screenWidth)
             {
                 vector.x = Verse.UI.screenWidth - InitialSize.x;
@@ -46,13 +47,14 @@ namespace FrontierDevelopments.General.Windows
                     return;
                 }
             }
+
             _callback((int)Widgets.HorizontalSlider(
-                    new Rect(5, 10, 165f, 25f), 
-                    _current(), 
-                    _floor, 
-                    _ceiling, 
-                    false, 
-                    "" + _current() + "/" + _ceiling, 
+                    new Rect(5, 10, 165f, 25f),
+                    _current(),
+                    _floor,
+                    _ceiling,
+                    false,
+                    "" + _current() + "/" + _ceiling,
                     _label));
         }
     }

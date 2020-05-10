@@ -1,6 +1,6 @@
+using FrontierDevelopments.General.Energy;
 using System;
 using System.Linq;
-using FrontierDevelopments.General.Energy;
 using Verse;
 
 namespace FrontierDevelopments.General.EnergySources
@@ -53,7 +53,6 @@ namespace FrontierDevelopments.General.EnergySources
         {
             ConnectTo(parent.AllComps.OfType<Object>().Concat(parent).OfType<IEnergyNet>().First());
             base.PostSpawnSetup(respawningAfterLoad);
-            
         }
 
         public override void PostDeSpawn(Map map)
@@ -70,7 +69,7 @@ namespace FrontierDevelopments.General.EnergySources
         {
             Scribe_References.Look(ref _parent, SaveKey + "NetParent");
             Scribe_Values.Look(ref _drawThisTick, SaveKey + "DrawThisTick");
-            
+
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 ConnectTo(_parent);

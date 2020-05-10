@@ -7,8 +7,6 @@ namespace FrontierDevelopments.General.Energy
         /// </summary>
         float Rate { get; }
 
-        
-
         /// <summary>
         /// Signal fired from a power net that indicates whether or not this device is powered.
         /// </summary>

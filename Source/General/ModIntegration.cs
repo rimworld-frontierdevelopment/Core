@@ -1,6 +1,6 @@
+using HarmonyLib;
 using System;
 using System.Reflection;
-using Harmony;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -13,7 +13,7 @@ namespace FrontierDevelopments.General
         public virtual Version OtherModVersion { get; }
         public virtual string IntegrationAssemblyPath { get; }
 
-        public bool TryEnable(HarmonyInstance harmony)
+        public bool TryEnable(Harmony harmony)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace FrontierDevelopments.General
                         var assembly = AssemblyUtility.FindModAssembly(ThisModName, IntegrationAssemblyPath);
                         if (assembly != null)
                         {
-                            harmony.PatchAll(assembly);
+                            harmony.PatchAll(assembly); 
                             Log.Message(ThisModName + " :: enabled " + OtherModName + " support for version " + version);
                             return true;
                         }
@@ -37,7 +37,7 @@ namespace FrontierDevelopments.General
                     }
                     else
                     {
-                        Log.Warning(ThisModName + " :: " + OtherModName + " " + version + 
+                        Log.Warning(ThisModName + " :: " + OtherModName + " " + version +
                                     " is loaded and " + OtherModVersion + " is required, not enabling support");
                     }
                 }

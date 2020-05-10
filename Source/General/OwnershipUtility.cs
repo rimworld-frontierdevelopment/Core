@@ -20,12 +20,16 @@ namespace FrontierDevelopments.General
             {
                 case null:
                     return false;
+
                 case MinifiedThing minifiedThing:
                     return PlayerOwns(minifiedThing.ParentHolder);
+
                 case Pawn pawn:
                     return pawn.Faction == Faction.OfPlayer;
+
                 case Pawn_InventoryTracker inventory:
                     return inventory.pawn.Faction == Faction.OfPlayer;
+
                 case IThingHolder parent:
                     return PlayerOwns(parent);
             }
@@ -42,12 +46,16 @@ namespace FrontierDevelopments.General
             {
                 case null:
                     return null;
+
                 case MinifiedThing minifiedThing:
                     return GetFaction(minifiedThing.ParentHolder);
+
                 case Pawn pawn:
                     return pawn.Faction;
+
                 case Pawn_InventoryTracker inventory:
                     return inventory.pawn.Faction;
+
                 case IThingHolder parent:
                     return GetFaction(parent);
             }

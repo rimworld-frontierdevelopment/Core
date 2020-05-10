@@ -9,6 +9,7 @@ namespace FrontierDevelopments.General
     {
         bool OverTemperature { get; }
         float Temp { get; }
+
         void PushHeat(float wattDays);
     }
 
@@ -20,6 +21,7 @@ namespace FrontierDevelopments.General
             {
                 case IHeatsink parentHeatsink:
                     return parentHeatsink;
+
                 default:
                     return FindComp(parent.AllComps);
             }

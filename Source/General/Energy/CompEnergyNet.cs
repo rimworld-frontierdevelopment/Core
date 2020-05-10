@@ -16,7 +16,7 @@ namespace FrontierDevelopments.General.Energy
         private EnergyNet _energyNet = new EnergyNet();
 
         public IEnergyNet Parent => _energyNet.Parent;
-        
+
         public IEnumerable<IEnergyNode> Nodes => _energyNet.Nodes;
 
         public void Connect(IEnergyNode node)
@@ -81,6 +81,7 @@ namespace FrontierDevelopments.General.Energy
         }
 
         public float Rate => _energyNet.Rate;
+
         public void HasPower(bool isPowered)
         {
             _energyNet.HasPower(isPowered);

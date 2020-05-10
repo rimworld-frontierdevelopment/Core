@@ -13,8 +13,7 @@ namespace FrontierDevelopments.General.EnergySources
         }
     }
 
-    
-    public class BatteryEnergySource: BaseEnergySource
+    public class BatteryEnergySource : BaseEnergySource
     {
         protected override string SaveKey => "BatterySource";
 
