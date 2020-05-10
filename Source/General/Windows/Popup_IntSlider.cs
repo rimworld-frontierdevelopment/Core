@@ -11,7 +11,6 @@ namespace FrontierDevelopments.General.Windows
         private readonly int _ceiling;
         private readonly Func<int> _current;
         private readonly Action<int> _callback;
-        //public override Vector2 InitialSize => new Vector2(100f, 100f);
         public Popup_IntSlider(string label, int floor, int ceiling, Func<int> current, Action<int> callback)
         {
             _label = label;
@@ -21,7 +20,7 @@ namespace FrontierDevelopments.General.Windows
             _callback = callback;
         }
 
-        public override void SetInitialSizeAndPosition()
+        protected override void SetInitialSizeAndPosition()
         {
             var vector = Verse.UI.MousePositionOnUIInverted;
 
