@@ -43,10 +43,10 @@ namespace FrontierDevelopments.General.EnergySources
 
         private bool IsActive()
         {
-            return Online() && base.RateAvailable >= Props.minimumOnlinePower;
+            return WantOnline() && base.RateAvailable >= Props.minimumOnlinePower;
         }
 
-        private bool Online()
+        private bool WantOnline()
         {
             return _powerTrader != null && _powerTrader.PowerOn;
         }
@@ -69,9 +69,13 @@ namespace FrontierDevelopments.General.EnergySources
         // Do the actual draw
         public override void CompTick()
         {
-            if (Online())
+            if (IsActive())
             {
                 _powerTrader.PowerOutput = - (MaxRate - RateAvailable) * GenDate.TicksPerDay;
+            }
+            else
+            {
+                _powerTrader.PowerOutput = 0;
             }
 
             base.CompTick();
