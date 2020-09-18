@@ -2,6 +2,7 @@
 <ModMetaData>
   <name>FrontierDevelopment-Core</name>
   <author>Jetpack Maniac and JohnnyNova</author>
+  <packageId>FrontierDevelopments.Core</packageId>
   <supportedVersions>
     <li>1.0</li>
   </supportedVersions>
