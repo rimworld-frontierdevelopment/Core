@@ -100,22 +100,15 @@ namespace FrontierDevelopments.General.EnergySources
             // this will have to wait until the next tick to resolve
             // we can be at most that wrong if we attempt to overdraw for next tick
             // TODO create a manager for PowerNets that can detect draw contention
-            var la = base.Consume(amount);
+            var possibleShortFall = amount - base.Consume(amount);
 
-            var possibleShortFall = amount - la;
-            
-            
-            
             if (possibleShortFall < 0)
             {
                 // not enough energy is stored
                 return -possibleShortFall;
             }
-            else
-            {
-                // good to go!
-                return amount;
-            }
+            // good to go!
+            return amount;
         }
     }
 }
