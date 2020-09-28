@@ -734,5 +734,3 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/vim,emacs,linux,macos,csharp,windows,intellij,visualstudio,visualstudiocode
 
 .idea/
-Assemblies/
-!Assemblies/0Harmony.dll
