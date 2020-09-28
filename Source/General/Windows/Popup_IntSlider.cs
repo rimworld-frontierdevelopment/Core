@@ -1,4 +1,5 @@
 ﻿using System;
+using FrontierDevelopments.General.UI;
 using UnityEngine;
 using Verse;
 
@@ -6,19 +7,16 @@ namespace FrontierDevelopments.General.Windows
 {
     public class Popup_IntSlider : Window
     {
-        private readonly string _label;
-        private readonly int _floor;
-        private readonly int _ceiling;
-        private readonly Func<int> _current;
-        private readonly Action<int> _callback;
+        private IntSlider _intSlider;
 
-        public Popup_IntSlider(string label, int floor, int ceiling, Func<int> current, Action<int> callback)
+        private int _width;
+        private int _height;
+
+        public Popup_IntSlider(string label, int floor, int ceiling, Func<int> current, Action<int> callback, int width = 215, int height = 75)
         {
-            _label = label;
-            _floor = floor;
-            _ceiling = ceiling;
-            _current = current;
-            _callback = callback;
+            _intSlider = new IntSlider(label, floor, ceiling, current, callback);
+            _width = width;
+            _height = height;
         }
 
         protected override void SetInitialSizeAndPosition()
@@ -32,7 +30,7 @@ namespace FrontierDevelopments.General.Windows
             {
                 vector.y = Verse.UI.screenHeight - InitialSize.y - 50;
             }
-            windowRect = new Rect(vector.x, vector.y + InitialSize.y - 100, 215, 75);
+            windowRect = new Rect(vector.x, vector.y + InitialSize.y - 100, _width, _height);
         }
 
         public override void DoWindowContents(Rect rect)
@@ -46,14 +44,7 @@ namespace FrontierDevelopments.General.Windows
                     return;
                 }
             }
-            _callback((int)Widgets.HorizontalSlider(
-                    new Rect(5, 10, 165f, 25f), 
-                    _current(), 
-                    _floor, 
-                    _ceiling, 
-                    false, 
-                    "" + _current() + "/" + _ceiling, 
-                    _label));
+            _intSlider.Draw(new Rect(5, 10, _width - 50, _height - 50));
         }
     }
 }

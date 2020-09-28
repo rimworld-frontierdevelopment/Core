@@ -69,6 +69,8 @@
     <Compile Include="General\PlaceWorkers\PlaceWorker_NeverUnstandable.cs" />
     <Compile Include="General\Settings.cs" />
     <Compile Include="General\UI\Elements.cs" />
+    <Compile Include="General\UI\IntSlider.cs" />
+    <Compile Include="General\UI\UiComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="General\PositionUtility.cs" />
     <Compile Include="General\Comps\Comp_BatteryInternal.cs" />
