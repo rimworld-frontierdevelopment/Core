@@ -1,3 +1,4 @@
+using System.Reflection;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -6,7 +7,8 @@ namespace FrontierDevelopments.General
     {
         public Mod(ModContentPack content) : base(content)
         {
-            
+            var harmony = new HarmonyLib.Harmony("FrontierDevelopments.Core");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
 }
