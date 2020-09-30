@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using HarmonyLib;
 using RimWorld;
 using Verse;
+using Verse.Sound;
 
 namespace FrontierDevelopments.General.Comps
 {
@@ -43,6 +44,7 @@ namespace FrontierDevelopments.General.Comps
             {
                 WantFlick = false;
                 parent.BroadcastCompSignal(SignalFlicked);
+                SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(parent.Position, parent.Map));
             }
         }
 
