@@ -102,6 +102,16 @@ namespace FrontierDevelopments.General.Comps
             }
         }
 
+        public static void EmitWantFlick(ThingComp comp)
+        {
+            comp.parent.BroadcastCompSignal(Comp_FlickBoard.SignalWant);
+        }
+
+        public static void EmitWantReset(ThingComp comp)
+        {
+            comp.parent.BroadcastCompSignal(Comp_FlickBoard.SignalReset);
+        }
+
         [HarmonyPatch]
         private static class Patch_MakeNewToils
         {
