@@ -69,7 +69,7 @@ namespace FrontierDevelopments.General.EnergySources
         // Do the actual draw
         public override void CompTick()
         {
-            if (IsActive())
+            if (WantOnline())
             {
                 _powerTrader.PowerOutput = - (MaxRate - RateAvailable) * GenDate.TicksPerDay;
             }
@@ -107,6 +107,7 @@ namespace FrontierDevelopments.General.EnergySources
                 // not enough energy is stored
                 return -possibleShortFall;
             }
+
             // good to go!
             return amount;
         }
