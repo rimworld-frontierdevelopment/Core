@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="General\AssemblyUtility.cs" />
+    <Compile Include="General\CollisionUtility.cs" />
     <Compile Include="General\Comps\Comp_FlickBoard.cs" />
     <Compile Include="General\EnergySources\BaseEnergySource.cs" />
     <Compile Include="General\EnergySources\BatteryEnergySource.cs" />
