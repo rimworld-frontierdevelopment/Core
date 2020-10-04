@@ -36,14 +36,18 @@ namespace FrontierDevelopments.General.UI
         public void Draw(Rect rect)
         {
             _hasMouse?.Invoke(rect.Contains(Event.current.mousePosition));
-            _onSet((int)Widgets.HorizontalSlider(
-                rect, 
-                _current(), 
-                _floor, 
-                _ceiling, 
-                false, 
-                "" + _current() + "/" + _ceiling, 
-                _label));
+            var current = _current();
+            var result = (int) Widgets.HorizontalSlider(
+                rect,
+                _current(),
+                _floor,
+                _ceiling,
+                false,
+                "" + current + "/" + _ceiling,
+                _label,
+                roundTo: 1f);
+            if(result != current)
+                _onSet(result);
         }
     }
 }
