@@ -83,5 +83,44 @@ namespace FrontierDevelopments.General
                 return Vector3.Distance(circleOrigin, point) < radius;
             }
         }
+
+        public static class LineSegment
+        {
+            // Implementation from here:
+            // https://jsfiddle.net/ferrybig/eokwL9mp/
+            public static Vector3? Other(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+            {
+                float? ComputeH(Vector3 p, Vector3 q, Vector3 r, Vector3 s)
+                {
+                    var e = q - p;
+                    var f = s - r;
+                    var g = new Vector3(-e.z, 0, e.x);
+
+                    var intersection = f.x * g.x + f.z * g.z;
+                    if(intersection == 0) {
+                        return null;
+                    }
+                    return ((p.x - r.x) * g.x + (p.z - r.z) * g.z) / intersection;
+                }
+
+                var h1 = ComputeH(a, b, c, d);
+                var h2 = ComputeH(c, d, a, b);
+
+                // parallel
+                if (h1 == null || h2 == null)
+                {
+                    return null;
+                }
+
+                // intersection
+                if (h1 >= 0 && h1 <= 1 && h2 >= 0 && h2 <= 1)
+                {
+                    var f = new Vector3(d.x-c.x, 0, d.z-c.z);
+                    return new Vector3(c.x + f.x * h1.Value, 0, c.z + f.z * h1.Value);
+                }
+
+                return null;
+            }
+        }
     }
 }
