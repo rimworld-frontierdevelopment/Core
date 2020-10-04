@@ -68,6 +68,7 @@
     <Compile Include="General\Energy\IEnergyNet.cs" />
     <Compile Include="General\Energy\IEnergyNode.cs" />
     <Compile Include="General\Energy\IEnergyProvider.cs" />
+    <Compile Include="General\GraphicsUtility.cs" />
     <Compile Include="General\ILabeled.cs" />
     <Compile Include="General\Mod.cs" />
     <Compile Include="General\ModIntegration.cs" />
