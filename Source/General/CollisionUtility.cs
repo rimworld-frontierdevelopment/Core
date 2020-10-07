@@ -53,7 +53,7 @@ namespace FrontierDevelopments.General
                 if( t2 >= 0 && t2 <= 1 )
                 {
                     // ExitWound
-                    return new Vector3(origin.x + t1 * d.x, origin.y + t1 * d.y, origin.z + t1 * d.z);
+                    return new Vector3(origin.x + t2 * d.x, origin.y + t2 * d.y, origin.z + t2 * d.z);
                 }
 
                 // no intersection: FallShort, Past, CompletelyInside
