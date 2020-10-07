@@ -85,6 +85,14 @@ namespace FrontierDevelopments.General.EnergySources
 
             base.CompTick();
         }
+        
+        public override void PostDraw()
+        {
+            if (CanBeOnline() && WantOnline() && !IsActive())
+            {
+                parent.Map.overlayDrawer.DrawOverlay(parent, OverlayTypes.NeedsPower);
+            }
+        }
 
         public override float Provide(float amount)
         {
