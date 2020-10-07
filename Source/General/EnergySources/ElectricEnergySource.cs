@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using FrontierDevelopments.General.Energy;
 using RimWorld;
 using Verse;
-using Verse.Noise;
 
 namespace FrontierDevelopments.General.EnergySources
 {
@@ -32,7 +30,7 @@ namespace FrontierDevelopments.General.EnergySources
         {
             get
             {
-                if (!IsActive()) return 0f;
+                if (!IsActive() || !WantOnline()) return 0f;
                 return base.RateAvailable;
             }
         }
@@ -43,12 +41,17 @@ namespace FrontierDevelopments.General.EnergySources
 
         private bool IsActive()
         {
-            return WantOnline() && base.RateAvailable >= Props.minimumOnlinePower;
+            return CanBeOnline() && WantOnline() && base.RateAvailable >= Props.minimumOnlinePower;
         }
 
         private bool WantOnline()
         {
-            return _powerTrader != null && _powerTrader.PowerOn;
+            return FlickUtility.WantsToBeOn(parent);
+        }
+
+        private bool CanBeOnline()
+        {
+            return _powerTrader != null;
         }
 
         private float GainEnergyAvailable => GainEnergyRate / GenDate.TicksPerDay;
@@ -69,9 +72,11 @@ namespace FrontierDevelopments.General.EnergySources
         // Do the actual draw
         public override void CompTick()
         {
-            if (WantOnline())
+            // use base.RateAvailable to get around current tick draw contention problems
+            // if we have an amount to draw this tick we need to draw it to be sure we can draw out the last power
+            if (DrawThisTick > 0)
             {
-                _powerTrader.PowerOutput = - (MaxRate - RateAvailable) * GenDate.TicksPerDay;
+                _powerTrader.PowerOutput = - (MaxRate - base.RateAvailable) * GenDate.TicksPerDay;
             }
             else
             {
@@ -95,13 +100,11 @@ namespace FrontierDevelopments.General.EnergySources
 
         public override float Consume(float amount)
         {
-            if (!IsActive()) return 0f;
             // figure out how much can be covered by network power
             // this will have to wait until the next tick to resolve
             // we can be at most that wrong if we attempt to overdraw for next tick
             // TODO create a manager for PowerNets that can detect draw contention
             var possibleShortFall = amount - base.Consume(amount);
-
             if (possibleShortFall < 0)
             {
                 // not enough energy is stored

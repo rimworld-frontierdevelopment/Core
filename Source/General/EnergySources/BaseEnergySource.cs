@@ -7,15 +7,15 @@ namespace FrontierDevelopments.General.EnergySources
 {
     public abstract class BaseEnergySource : ThingComp, IEnergyProvider
     {
-        private float _drawThisTick;
+        protected float DrawThisTick;
         private IEnergyNet _parent;
 
         public IEnergyNet Parent => _parent;
 
-        public virtual float AmountAvailable => throw new Exception();
-        public virtual float TotalAvailable => throw new Exception();
-        public virtual float RateAvailable => Math.Min(MaxRate - _drawThisTick, AmountAvailable);
-        public virtual float MaxRate => throw new Exception();
+        public abstract float AmountAvailable { get; }
+        public abstract float TotalAvailable { get; }
+        public virtual float RateAvailable => Math.Min(MaxRate - DrawThisTick, AmountAvailable);
+        public abstract float MaxRate { get; }
 
         protected abstract string SaveKey { get; }
 
@@ -45,7 +45,7 @@ namespace FrontierDevelopments.General.EnergySources
         public virtual float Request(float amount)
         {
             if (amount > RateAvailable) amount = RateAvailable;
-            _drawThisTick += amount;
+            DrawThisTick += amount;
             return amount;
         }
 
@@ -63,13 +63,13 @@ namespace FrontierDevelopments.General.EnergySources
 
         public void Update()
         {
-            _drawThisTick = 0;
+            DrawThisTick = 0;
         }
 
         public override void PostExposeData()
         {
             Scribe_References.Look(ref _parent, SaveKey + "NetParent");
-            Scribe_Values.Look(ref _drawThisTick, SaveKey + "DrawThisTick");
+            Scribe_Values.Look(ref DrawThisTick, SaveKey + "DrawThisTick");
             
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
