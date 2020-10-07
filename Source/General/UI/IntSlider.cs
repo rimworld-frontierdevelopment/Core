@@ -33,6 +33,8 @@ namespace FrontierDevelopments.General.UI
             _hasMouse = hasMouse;
         }
 
+        public int Height => 60;
+
         public void Draw(Rect rect)
         {
             _hasMouse?.Invoke(rect.Contains(Event.current.mousePosition));
