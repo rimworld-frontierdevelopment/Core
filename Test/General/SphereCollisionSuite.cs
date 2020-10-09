@@ -79,6 +79,32 @@ namespace FrontierDevelopments.General
         }
         
         [Test]
+        public static void LineSegmentPokeUp()
+        {
+            var a = origin + Vector3.up * (radius + 1);
+            var b = origin + Vector3.up * (radius - 1);
+            
+            Assert(Vector3.Distance(a, origin) > radius).True();
+            Assert(Vector3.Distance(b, origin) < radius).True();
+
+            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
+            Assert(actual.HasValue && actual.Value == origin + Vector3.up * radius).True();
+        }
+        
+        [Test]
+        public static void LineSegmentPokeDown()
+        {
+            var a = origin + Vector3.down * (radius + 1);
+            var b = origin + Vector3.down * (radius - 1);
+            
+            Assert(Vector3.Distance(a, origin) > radius).True();
+            Assert(Vector3.Distance(b, origin) < radius).True();
+
+            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
+            Assert(actual.HasValue && actual.Value == origin + Vector3.down * radius).True();
+        }
+        
+        [Test]
         public static void LineSegmentExitWoundLeft()
         {
             var a = origin - Vector3.right * (radius - 1);
