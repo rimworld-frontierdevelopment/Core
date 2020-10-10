@@ -40,24 +40,53 @@ namespace FrontierDevelopments.General
                 //       ->  o                     o ->              | -> |
                 // FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
 
-                if( t1 >= 0 && t1 <= 1 )
+                Vector3 Hit(float t)
                 {
-                    // t1 is the intersection, and it's closer than t2
-                    // (since t1 uses -b - discriminant)
-                    // Impale, Poke
-                    return new Vector3(origin.x + t1 * d.x, origin.y + t1 * d.y, origin.z + t1 * d.z);
+                    return new Vector3(origin.x + t * d.x, origin.y + t * d.y, origin.z + t * d.z);
                 }
 
-                // here t1 didn't intersect so we are either started
-                // inside the sphere or completely past it
-                if( t2 >= 0 && t2 <= 1 )
+                // This is if the origin is inside or past the circle
+                // Possible:
+                //  Hit: exit
+                //  Miss: completely inside
+                //  Miss: past
+                if (t1 < -0.00001f)
                 {
-                    // ExitWound
-                    return new Vector3(origin.x + t2 * d.x, origin.y + t2 * d.y, origin.z + t2 * d.z);
-                }
+                    // Hit: Exit
+                    if (0 <= t2 && t2 <= 1f)
+                    {
+                        return Hit(t2);
+                    }
 
-                // no intersection: FallShort, Past, CompletelyInside
-                return null;
+                    // Miss: completely inside
+                    // Miss: Past
+                    return null;
+                }
+                // Starting outside
+                // Possible:
+                //  Hit: Enter
+                //  Hit: Through
+                //  Miss: fall short
+                else
+                {
+                    if (1f < t2)
+                    {
+                        if (1.00001f < t1)
+                        {
+                            // Miss: fall short
+                            return null;
+                        }
+                        else
+                        {
+                            // Hit: enter
+                            Hit(t1);
+                        }
+                    }
+
+                    // Hit: through
+                    // t2 is also a valid collision point here also
+                    return Hit(t1);
+                }
             }
 
             public static bool CellRect(Vector3 circleOrigin, float radius, CellRect rect)

@@ -1,5 +1,9 @@
+using System;
+using System.Linq;
+using System.Text;
 using RimTest;
 using UnityEngine;
+using Verse;
 using static RimTest.Assertion;
 
 namespace FrontierDevelopments.General
@@ -7,217 +11,215 @@ namespace FrontierDevelopments.General
     [TestSuite]
     public static class SphereCollisionSuite
     {
-        static float radius = 10f;
-        static Vector3 origin = Vector3.right * radius;
+        private const float Radius = 10f;
+        private static readonly Vector3 Origin = Vector3.right * Radius;
+
+        [Test]
+        public static void ValidatePointInside()
+        {
+            Assert(Vector3.Distance(PointInside(Vector3.right), Origin) < Radius).True();
+        }
+
+        [Test]
+        public static void ValidatePointOutside()
+        {
+            Assert(Vector3.Distance(PointOutside(Vector3.right), Origin) > Radius).True();
+        }
+
+        [Test]
+        public static void ValidatePointOnEdge()
+        {
+            Assert(Vector3.Distance(PointOnEdge(Vector3.right), Origin) == Radius).True();
+        }
 
         [Test]
         public static void PointIntersects()
         {
             var a = PointInside(Vector3.right);
-            Assert(Vector3.Distance(a, origin) < radius).True();
-            Assert(CollisionUtility.Circle.Point(origin, radius, a)).True();
+            Assert(Vector3.Distance(a, Origin) < Radius).True();
+            Assert(CollisionUtility.Circle.Point(Origin, Radius, a)).True();
         }
 
         [Test]
         public static void PointDoesNotIntersect()
         {
             var a = PointOutside(Vector3.right);
-            Assert(Vector3.Distance(a, origin) > radius).True();
-            Assert(CollisionUtility.Circle.Point(origin, radius, a)).False();
+            Assert(Vector3.Distance(a, Origin) > Radius).True();
+            Assert(CollisionUtility.Circle.Point(Origin, Radius, a)).False();
         }
 
         [Test]
-        public static void LineSegmentMiss()
+        public static void LineSegmentEnter()
         {
-            var a = origin * radius;
-            var b = origin * (radius + 1);
-            
-            Assert(Vector3.Distance(a, origin) > radius).True();
-            Assert(Vector3.Distance(b, origin) > radius).True();
+            TestAllAngles("Enter", TestPoke, ShouldHaveResult);
+        }
+        
+        [Test]
+        public static void LineSegmentExit()
+        {
+            TestAllAngles("Exit", TestExitWound, ShouldHaveResult);
+        }
 
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue).Is.False();
+        [Test]
+        public static void LineSegmentThrough()
+        {
+            TestAllAngles("Through", TestImpale, ShouldHaveResult);
+        }
+
+        [Test]
+        public static void LineSegmentTouchOutside()
+        {
+            TestAllAngles("Touch outer", TestTouchOuter, ShouldHaveResult);
+        }
+        
+        [Test]
+        public static void LineSegmentTouchInside()
+        {
+            TestAllAngles("Touch inner", TestTouchInner, ShouldHaveResult);
+        }
+        
+        [Test]
+        public static void LineSegmentOutside()
+        {
+            TestAllAngles("Outside", TestOutside, ShouldHaveNoResult);
         }
 
         [Test]
         public static void LineSegmentInside()
         {
-            var a = PointInside(Vector3.left);
-            var b = PointInside(Vector3.right);
+            TestAllAngles("Inside", TestInside, ShouldHaveNoResult);
+        }
+
+        private static void TestAllAngles(string name, Func<Vector3, Vector3?> doTest, Func<Vector3?, Vector3, bool> validator)
+        {
+            var failures = 0;
+            var failureText = new StringBuilder();
+
+            var degrees = CircleUtility.Degrees(0.1f).ToList();
+
+            string TestUnit(Vector3 direction)
+            {
+                var ray = new Ray(Vector3.zero, direction);
+                var unit = ray.GetPoint(1f);
+
+                var actual = doTest.Invoke(unit);
+                var passed = validator.Invoke(actual, unit);
+
+                if (!passed)
+                {
+                    failures++;
+
+                    if (actual == null)
+                    {
+                        return "no result when one was expected";
+                    }
+                    else
+                    {
+                        return "Distance between actual and expected: " + Vector3.Distance(PointOnEdge(unit), actual.Value);
+                    }
+                }
+
+                return null;
+            }
+
+            var errorMessage = TestUnit(Vector3.up);
+            if (errorMessage != null)
+            {
+                failureText.AppendLine("Up: " + errorMessage);
+            }
             
-            Assert(Vector3.Distance(a, origin) < radius).True();
-            Assert(Vector3.Distance(b, origin) < radius).True();
+            errorMessage = TestUnit(Vector3.down);
+            if (errorMessage != null)
+            {
+                failureText.AppendLine("Down: " + errorMessage);
+            }
+            
+            foreach (var degree in degrees)
+            {
+                errorMessage = TestUnit(CircleUtility.PolarToCartesian(degree));
+                if (errorMessage != null)
+                {
+                    failureText.AppendLine("" + degree + ": " + errorMessage);
+                }
+            }
 
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue).Is.False();
-        }
-
-        [Test]
-        public static void LineSegmentPokeLeft()
-        {
-            TestPoke(Vector3.left);
-        }
-        
-        [Test]
-        public static void LineSegmentPokeRight()
-        {
-            TestPoke(Vector3.right);
-        }
-        
-        [Test]
-        public static void LineSegmentPokeUp()
-        {
-            TestPoke(Vector3.up);
-        }
-        
-        [Test]
-        public static void LineSegmentPokeDown()
-        {
-            TestPoke(Vector3.down);
+            if (failures > 0)
+            {
+                Log.Error(name + " Failures: " + failures + " out of " + degrees.Count + 2 + " cases\n" + failureText.ToString().TrimEndNewlines());
+                Assert(false).True();
+            }
         }
 
-        [Test]
-        public static void LineSegmentExitWoundLeft()
+        private static bool ShouldHaveResult(Vector3? actual, Vector3 unit)
         {
-            TestExitWound(Vector3.left);
-        }
-        
-        [Test]
-        public static void LineSegmentExitWoundRight()
-        {
-            TestExitWound(Vector3.right);
-        }
-        
-        [Test]
-        public static void LineSegmentExitWoundUp()
-        {
-            TestExitWound(Vector3.up);
-        }
-        
-        [Test]
-        public static void LineSegmentExitWoundDown()
-        {
-            TestExitWound(Vector3.down);
-        }
-        
-        public static void LineSegmentExitWoundForward()
-        {
-            TestExitWound(Vector3.forward);
-        }
-        
-        [Test]
-        public static void LineSegmentExitWoundBack()
-        {
-            TestExitWound(Vector3.back);
+            return actual.HasValue && actual.Value == PointOnEdge(unit);
         }
 
-        [Test]
-        public static void LineSegmentImpaleLeft()
+        private static bool ShouldHaveNoResult(Vector3? actual, Vector3 unit)
         {
-            TestImpale(Vector3.left);
+            return !actual.HasValue;
         }
         
-        [Test]
-        public static void LineSegmentImpaleRight()
-        {
-            TestImpale(Vector3.right);
-        }
+        private static Vector3 PointInside(Vector3 unit, float offset=1f) => Origin + unit * (Radius - offset);
 
-        [Test]
-        public static void LineSegmentTouchOuterRight()
-        {
-            TestTouchOuter(Vector3.right);
-        }
-        
-        [Test]
-        public static void LineSegmentTouchInnerRight()
-        {
-            TestTouchInner(Vector3.right);
-        }
-        
-        private static Vector3 PointInside(Vector3 unit)
-        {
-            return origin + unit * (radius - 1);
-        }
-        
-        private static Vector3 PointOutside(Vector3 unit)
-        {
-            return origin + unit * (radius + 1);
-        }
-        
-        private static Vector3 PointOnEdge(Vector3 unit)
-        {
-            return origin + unit * radius;
-        }
-        
-        private static void TestPoke(Vector3 unit)
-        {
-            Assert(unit.magnitude < 1.001 && unit.magnitude > 0.999);
+        private static Vector3 PointOutside(Vector3 unit, float offset=1f) => Origin + unit * (Radius + offset);
 
+        private static Vector3 PointOnEdge(Vector3 unit) => Origin + unit * Radius;
+
+        private static Vector3? TestPoke(Vector3 unit)
+        {
             var a = PointOutside(unit);
             var b = PointInside(unit);
 
-            Assert(Vector3.Distance(a, origin) > radius).True();
-            Assert(Vector3.Distance(b, origin) < radius).True();
-
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue && actual.Value == PointOnEdge(unit)).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
         }
 
-        private static void TestExitWound(Vector3 unit)
+        private static Vector3? TestExitWound(Vector3 unit)
         {
-            Assert(unit.magnitude < 1.001 && unit.magnitude > 0.999);
-
             var a = PointInside(unit);
             var b = PointOutside(unit);
-            
-            Assert(Vector3.Distance(a, origin) < radius).True();
-            Assert(Vector3.Distance(b, origin) > radius).True();
 
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue && actual.Value == PointOnEdge(unit)).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
         }
-        
-        private static void TestTouchInner(Vector3 unit)
-        {
-            Assert(unit.magnitude < 1.001 && unit.magnitude > 0.999);
 
+        private static Vector3? TestTouchInner(Vector3 unit)
+        {
             var a = PointOnEdge(unit);
-            var b = PointOutside(unit);
+            var b = PointInside(unit);
 
-            Assert(Vector3.Distance(a, origin) - radius <= 0.01).True();
-            Assert(Vector3.Distance(b, origin) > radius).True();
-
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue && actual.Value == PointOnEdge(unit)).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
         }
-        
-        private static void TestTouchOuter(Vector3 unit)
-        {
-            Assert(unit.magnitude < 1.001 && unit.magnitude > 0.999);
 
+        private static Vector3? TestTouchOuter(Vector3 unit)
+        {
             var a = PointOutside(unit);
             var b = PointOnEdge(unit);
 
-            Assert(Vector3.Distance(a, origin) > radius).True();
-            Assert(Vector3.Distance(b, origin) - radius < 0.01f).True();
-
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue && actual.Value == PointOnEdge(unit)).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
         }
-        
-        private static void TestImpale(Vector3 unit)
-        {
-            Assert(unit.magnitude < 1.001 && unit.magnitude > 0.999);
 
+        private static Vector3? TestImpale(Vector3 unit)
+        {
             var a = PointOutside(unit);
             var b = PointOutside(-unit);
             
-            Assert(Vector3.Distance(a, origin) > radius).True();
-            Assert(Vector3.Distance(b, origin) > radius).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
+        }
+
+        private static Vector3? TestOutside(Vector3 unit)
+        {
+            var a = PointOutside(unit, 0.01f);
+            var b = PointOutside(unit, 2f);
+
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
+        }
+
+        private static Vector3? TestInside(Vector3 unit)
+        {
+            var a = PointInside(unit, 0.01f);
+            var b = PointInside(unit, 2f);
             
-            var actual = CollisionUtility.Circle.LineSegment(origin, radius, a, b);
-            Assert(actual.HasValue && actual.Value == PointOnEdge(unit)).True();
+            return CollisionUtility.Circle.LineSegment(Origin, Radius, a, b);
         }
     }
 }
