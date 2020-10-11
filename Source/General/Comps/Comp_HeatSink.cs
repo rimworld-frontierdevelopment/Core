@@ -31,7 +31,18 @@ namespace FrontierDevelopments.General.Comps
         private float _dissipationRate;
         private float _temperature = -500f;
         private bool _thermalShutoff = true;
+        private bool _wantThermalShutoff = true;
         private float _shutoffTemperature = -500f;
+
+        public bool WantThermalShutoff
+        {
+            get => _wantThermalShutoff;
+            set => SetThermalShutoff(value);
+        }
+
+        public bool ThermalShutoff => _thermalShutoff;
+
+        private bool WantFlick => _wantThermalShutoff != _thermalShutoff;
 
         public bool CanBreakdown => !_thermalShutoff && OverMinorThreshold;
         
@@ -107,10 +118,25 @@ namespace FrontierDevelopments.General.Comps
             return "fd.heatsink.temperature".Translate() + ": " + Temp.ToStringTemperature();
         }
 
+        public override void ReceiveCompSignal(string signal)
+        {
+            switch (signal)
+            {
+                case Comp_FlickBoard.SignalFlicked:
+                    _thermalShutoff = _wantThermalShutoff;
+                    break;
+                case Comp_FlickBoard.SignalReset:
+                    if(WantFlick)
+                        parent.BroadcastCompSignal(Comp_FlickBoard.SignalWant);
+                    break;
+            }
+        }
+
         public override void PostExposeData()
         {
             Scribe_Values.Look(ref _temperature, "temperature", -500f);
             Scribe_Values.Look(ref _thermalShutoff, "thermalShutoff", true);
+            Scribe_Values.Look(ref _wantThermalShutoff, "wantThermalShutoff", true);
             Scribe_Values.Look(ref _shutoffTemperature, "shutoffTemperature", -500f);
         }
 
@@ -123,9 +149,25 @@ namespace FrontierDevelopments.General.Comps
 //                    icon = Resources.UiThermalShutoff,
                     defaultDesc = "thermal_shutoff.description".Translate(),
                     defaultLabel = "thermal_shutoff.label".Translate(),
-                    isActive = () => _thermalShutoff,
-                    toggleAction = () => _thermalShutoff = !_thermalShutoff
+                    isActive = () => _wantThermalShutoff,
+                    toggleAction = () => SetThermalShutoff(_wantThermalShutoff = !_wantThermalShutoff)
                 };
+            }
+        }
+
+        private void SetThermalShutoff(bool value)
+        {
+            _wantThermalShutoff = value;
+            if (parent.GetComp<Comp_FlickBoard>() != null)
+            {
+                if (WantFlick)
+                    Comp_FlickBoard.EmitWantFlick(this);
+                else
+                    Comp_FlickBoard.EmitWantReset(this);
+            }
+            else
+            {
+                _thermalShutoff = value;
             }
         }
 

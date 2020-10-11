@@ -10,6 +10,8 @@ namespace FrontierDevelopments.General
         bool OverTemperature { get; }
         float Temp { get; }
         void PushHeat(float wattDays);
+        bool WantThermalShutoff { get; set; }
+        bool ThermalShutoff { get; }
     }
 
     public class HeatsinkUtility
