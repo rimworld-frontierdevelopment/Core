@@ -75,6 +75,7 @@
     <Compile Include="General\OwnershipUtility.cs" />
     <Compile Include="General\PlaceWorkers\PlaceWorker_NeverUnstandable.cs" />
     <Compile Include="General\Settings.cs" />
+    <Compile Include="General\UI\CheckboxComponent.cs" />
     <Compile Include="General\UI\Elements.cs" />
     <Compile Include="General\UI\IntSlider.cs" />
     <Compile Include="General\UI\TextComponent.cs" />
