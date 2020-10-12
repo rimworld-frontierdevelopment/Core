@@ -24,7 +24,7 @@ namespace FrontierDevelopments.General.Comps
         }
     }
     
-    public class Comp_HeatSink : ThingComp, IHeatsink
+    public class Comp_HeatSink : ThingComp, IHeatsink, IFlickBoardSwitch
     {
         public static readonly float KELVIN_ZERO_CELCIUS = 273.15f;
 
@@ -42,7 +42,7 @@ namespace FrontierDevelopments.General.Comps
 
         public bool ThermalShutoff => _thermalShutoff;
 
-        private bool WantFlick => _wantThermalShutoff != _thermalShutoff;
+        public bool WantFlick => _wantThermalShutoff != _thermalShutoff;
 
         public bool CanBreakdown => !_thermalShutoff && OverMinorThreshold;
         
@@ -118,18 +118,9 @@ namespace FrontierDevelopments.General.Comps
             return "fd.heatsink.temperature".Translate(Temp.ToStringTemperature());
         }
 
-        public override void ReceiveCompSignal(string signal)
+        public void Notify_Flicked()
         {
-            switch (signal)
-            {
-                case Comp_FlickBoard.SignalFlicked:
-                    _thermalShutoff = _wantThermalShutoff;
-                    break;
-                case Comp_FlickBoard.SignalReset:
-                    if(WantFlick)
-                        parent.BroadcastCompSignal(Comp_FlickBoard.SignalWant);
-                    break;
-            }
+            _thermalShutoff = _wantThermalShutoff;
         }
 
         public override void PostExposeData()
@@ -158,12 +149,10 @@ namespace FrontierDevelopments.General.Comps
         private void SetThermalShutoff(bool value)
         {
             _wantThermalShutoff = value;
-            if (parent.GetComp<Comp_FlickBoard>() != null)
+            var flickBoard = FlickBoardUtility.FindBoard(parent);
+            if (flickBoard != null)
             {
-                if (WantFlick)
-                    Comp_FlickBoard.EmitWantFlick(this);
-                else
-                    Comp_FlickBoard.EmitWantReset(this);
+                flickBoard.Notify_Want(WantFlick);
             }
             else
             {

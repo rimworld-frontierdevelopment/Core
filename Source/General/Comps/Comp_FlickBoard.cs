@@ -18,32 +18,27 @@ namespace FrontierDevelopments.General.Comps
         }
     }
 
+    public interface IFlickBoardSwitch
+    {
+        bool WantFlick { get; }
+        void Notify_Flicked();
+    }
+
     public class Comp_FlickBoard : ThingComp
     {
         private static bool JobPatched = true;
-        
-        public const string SignalFlicked = "FlickBoard_Flicked";
-        public const string SignalWant = "FlickBoard_Want";
-        public const string SignalReset = "FlickBoard_Reset";
-        
-        private bool _wantFlick;
 
-        public bool WantFlick
-        {
-            get => _wantFlick;
-            set
-            {
-                _wantFlick = value;
-                UpdateDesignation();
-            }
-        }
+        private IEnumerable<IFlickBoardSwitch> Switches => FlickBoardUtility.FindSwitches(parent);
+
+        private bool WantFlick => Switches.Any(flickSwitch => flickSwitch.WantFlick);
+
+        private void FlickSwitches() => Switches.Do(flickSwitch => flickSwitch.Notify_Flicked());
 
         private void DoFlick()
         {
             if (WantFlick)
             {
-                WantFlick = false;
-                parent.BroadcastCompSignal(SignalFlicked);
+                FlickSwitches();
                 SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(parent.Position, parent.Map));
             }
         }
@@ -52,7 +47,7 @@ namespace FrontierDevelopments.General.Comps
         {
             if (!JobPatched)
             {
-                parent.BroadcastCompSignal(SignalFlicked);
+                FlickSwitches();
                 return;
             }
             
@@ -73,22 +68,17 @@ namespace FrontierDevelopments.General.Comps
             }
         }
 
-        public override void ReceiveCompSignal(string signal)
+        public void Notify_Want(bool wantFlick)
         {
-            switch (signal)
-            {
-                case SignalWant:
-                    WantFlick = true;
-                    break;
-                case SignalReset:
-                    WantFlick = false;
-                    break;
-            }
+            UpdateDesignation();
         }
 
         public override void PostExposeData()
         {
-            Scribe_Values.Look(ref _wantFlick, "wantFlick");
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                // update designation if needed here
+            }
         }
         
         private static void HandleFlickBoardFlick(ThingComp comp)
@@ -100,16 +90,6 @@ namespace FrontierDevelopments.General.Comps
                         flickBoard.DoFlick();
                     break;
             }
-        }
-
-        public static void EmitWantFlick(ThingComp comp)
-        {
-            comp.parent.BroadcastCompSignal(Comp_FlickBoard.SignalWant);
-        }
-
-        public static void EmitWantReset(ThingComp comp)
-        {
-            comp.parent.BroadcastCompSignal(Comp_FlickBoard.SignalReset);
         }
 
         [HarmonyPatch]
@@ -172,6 +152,35 @@ namespace FrontierDevelopments.General.Comps
             {
                 return new Patcher().Apply(instructions);
             }
+        }
+    }
+
+    public static class FlickBoardUtility
+    {
+        public static Comp_FlickBoard FindBoard(ThingWithComps thing)
+        {
+            return thing.GetComp<Comp_FlickBoard>();
+        }
+
+        public static IEnumerable<IFlickBoardSwitch> FindSwitches(Thing thing)
+        {
+            if (thing is IFlickBoardSwitch thingSwitch)
+            {
+                yield return thingSwitch;
+            }
+
+            if (thing is ThingWithComps thingWithComps)
+            {
+                foreach (var compSwitch in Find(thingWithComps.AllComps))
+                {
+                    yield return compSwitch;
+                }
+            }
+        }
+
+        public static IEnumerable<IFlickBoardSwitch> Find(IEnumerable<ThingComp> comps)
+        {
+            return comps.OfType<IFlickBoardSwitch>();
         }
     }
 }
