@@ -79,6 +79,7 @@
     <Compile Include="General\UI\Elements.cs" />
     <Compile Include="General\UI\IntSlider.cs" />
     <Compile Include="General\UI\TextComponent.cs" />
+    <Compile Include="General\UI\TitledSectionComponent.cs" />
     <Compile Include="General\UI\UiComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="General\PositionUtility.cs" />
