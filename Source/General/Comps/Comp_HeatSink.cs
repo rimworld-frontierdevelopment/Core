@@ -48,24 +48,28 @@ namespace FrontierDevelopments.General.Comps
         
         public CompProperties_HeatSink Props => (CompProperties_HeatSink)props;
 
-        public float Temp => _temperature; 
+        public float Temp => Settings.EnableThermal ? _temperature : AmbientTemp();
 
         private float Joules
         {
             get => (_temperature + KELVIN_ZERO_CELCIUS) * Props.specificHeat * Props.grams;
-            set =>  _temperature = value / Props.specificHeat / Props.grams - KELVIN_ZERO_CELCIUS;
+            set
+            {
+                if(Settings.EnableThermal)
+                    _temperature = value / Props.specificHeat / Props.grams - KELVIN_ZERO_CELCIUS;
+            }
         }
 
         public bool OverTemperature => _thermalShutoff && Temp > _shutoffTemperature
                                        || !Settings.EnableCriticalThermalIncidents && OverMaximumTemperature;
 
-        public bool OverMinorThreshold => Temp >= Props.minorThreshold;
+        public bool OverMinorThreshold => Settings.EnableThermal && Temp >= Props.minorThreshold;
         
-        public bool OverMajorThreshold => Temp >= Props.majorThreshold;
+        public bool OverMajorThreshold => Settings.EnableThermal && Temp >= Props.majorThreshold;
         
-        public bool OverCriticalThreshold => Temp >= Props.criticalThreshold;
+        public bool OverCriticalThreshold => Settings.EnableThermal && Temp >= Props.criticalThreshold;
 
-        public bool OverMaximumTemperature => Temp >= MaximumTemperature;
+        public bool OverMaximumTemperature => Settings.EnableThermal && Temp >= MaximumTemperature;
 
         public virtual float MaximumTemperature => Props.maximumTemperature;
 
@@ -100,7 +104,7 @@ namespace FrontierDevelopments.General.Comps
 
         public override void CompTick()
         {
-            if (OverMaximumTemperature && Settings.EnableCriticalThermalIncidents)
+            if (OverMaximumTemperature && Settings.EnableCriticalThermalIncidents && Settings.EnableThermal)
             {
                 DoCriticalBreakdown();
             }
