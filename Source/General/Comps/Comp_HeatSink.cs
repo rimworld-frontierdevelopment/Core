@@ -141,7 +141,7 @@ namespace FrontierDevelopments.General.Comps
             {
                 yield return new Command_Toggle
                 {
-//                    icon = Resources.UiThermalShutoff,
+                    icon = Resources.UiThermalShutoff,
                     defaultDesc = "thermal_shutoff.description".Translate(),
                     defaultLabel = "thermal_shutoff.label".Translate(),
                     isActive = () => _wantThermalShutoff,

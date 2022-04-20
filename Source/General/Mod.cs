@@ -1,4 +1,5 @@
 using System.Reflection;
+using UnityEngine;
 using Verse;
 
 namespace FrontierDevelopments.General
@@ -10,5 +11,11 @@ namespace FrontierDevelopments.General
             var harmony = new HarmonyLib.Harmony("FrontierDevelopments.Core");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
+    }
+
+    [StaticConstructorOnStartup]
+    public static class Resources
+    {
+        public static readonly Texture2D UiThermalShutoff = ContentFinder<Texture2D>.Get("UI/Buttons/ThermalShutoff");
     }
 }
