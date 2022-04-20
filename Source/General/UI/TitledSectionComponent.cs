@@ -35,7 +35,7 @@ namespace FrontierDevelopments.General.UI
 
             foreach (var component in Components)
             {
-                var section = list.BeginSection_NewTemp(component.Height, sectionBorder, sectionBorder);
+                var section = list.BeginSection(component.Height, sectionBorder, sectionBorder);
                 component.Draw(section.GetRect(component.Height));
                 list.EndSection(section);
                 list.Gap(gapHeight);
